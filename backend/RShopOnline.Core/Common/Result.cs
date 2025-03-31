@@ -32,6 +32,10 @@ public class Result<TValue>
     public bool IsSuccess { get; }
     public bool IsFailure => !IsSuccess;
 
+    public static Result<TValue> Success(TValue value) => new(value);
+
+    public static Result<TValue> Failure(Error error) => new(error);
+
     public static implicit operator Result<TValue>(TValue value) => new(value);
     public static implicit operator Result<TValue>(Error error) => new(error);
 }

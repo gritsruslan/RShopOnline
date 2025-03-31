@@ -2,7 +2,6 @@ using System.Reflection;
 using Microsoft.EntityFrameworkCore;
 using RShopAPI_Test.Mapping;
 using RShopAPI_Test.Middlewares;
-using RShopAPI_Test.Services.Interfaces;
 using RShopAPI_Test.Services.UseCases.CreateCategory;
 using RShopAPI_Test.Services.UseCases.CreateProduct;
 using RShopAPI_Test.Services.UseCases.GetCatigoriesUseCase;
@@ -38,7 +37,7 @@ builder.Services.AddScoped<ICreateProductUseCase, CreateProductUseCase>();
 builder.Services.AddScoped<ICreateProductStorage, CreateProductStorage>();
 
 builder.Services.AddScoped<IGetProductUseCase, GetProductUseCase>();
-builder.Services.AddScoped<IGetProductsUseCase, GetProductsUseCase>();
+builder.Services.AddScoped<IGetAllProductsUseCase, GetAllProductsUseCase>();
 builder.Services.AddScoped<IGetProductsStorage, GetProductsStorage>();
 
 builder.Services.AddScoped<IUpdateProductUseCase, UpdateProductUseCase>();

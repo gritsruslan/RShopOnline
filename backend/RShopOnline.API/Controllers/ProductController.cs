@@ -3,9 +3,9 @@ using Microsoft.AspNetCore.Mvc;
 using RShopAPI_Test.Core.Models;
 using RShopAPI_Test.DTOs;
 using RShopAPI_Test.Services.Commands;
-using RShopAPI_Test.Services.Interfaces;
 using RShopAPI_Test.Services.UseCases.CreateProduct;
 using RShopAPI_Test.Services.UseCases.GetProduct;
+using RShopAPI_Test.Services.UseCases.GetProducts;
 using RShopAPI_Test.Services.UseCases.UpdateProduct;
 
 namespace RShopAPI_Test.Controllers;
@@ -14,12 +14,29 @@ namespace RShopAPI_Test.Controllers;
 [Route("/api/products")]
 public class ProductController : ControllerBase
 {
-    [HttpGet] // TODO Pagination, filters and sorting
+    [HttpGet]
     [ProducesResponseType<List<Product>>(200)]
-    public async Task<IActionResult> GetProducts([FromServices] IGetProductsUseCase useCase, CancellationToken ct)
+    public async Task<IActionResult> GetAllProducts([FromServices] IGetAllProductsUseCase useCase, CancellationToken ct)
     {
         var products = await useCase.Handle(ct);
         return Ok(products);
+    }
+
+    [HttpGet]
+    [ProducesResponseType<List<Product>>( 200)]
+    [ProducesResponseType(400)]
+    public async Task<IActionResult> GetProducts(
+        [FromServices] IGetProductsUseCase useCase,
+        [FromServices] IMapper mapper,
+        [FromBody] GetProductsRequest request, 
+        CancellationToken ct)
+    {
+        var result = await useCase.Handle(mapper.Map<GetProductsCommand>(request), ct);
+
+        if (result.IsFailure)
+            return BadRequest(result.Error);
+
+        return Ok(result.Value);
     }
     
     [HttpGet("{id::guid}")]

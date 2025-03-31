@@ -1,13 +1,45 @@
-﻿using RShopAPI_Test.Core.Models;
-using RShopAPI_Test.Services.Interfaces;
+﻿using RShopAPI_Test.Core.Common;
+using RShopAPI_Test.Core.Enums;
+using RShopAPI_Test.Core.Models;
 using RShopAPI_Test.Storage.Interfaces;
 
 namespace RShopAPI_Test.Services.UseCases.GetProducts;
 
-public class GetProductsUseCase(IGetProductsStorage storage) : IGetProductsUseCase
+public class GetProductsUseCase(
+    IGetProductsStorage productsStorage, 
+    IGetCategoriesStorage categoriesStorage) : IGetProductsUseCase
 {
-    public async Task<IEnumerable<Product>> Handle( CancellationToken ct)
+    private readonly IReadOnlySet<string> _productFields = 
+        new HashSet<string> {"Name", "Price", "InStock"};
+        
+    public async Task<Result<IEnumerable<Product>>> Handle(GetProductsCommand command, CancellationToken ct)
     {
-        return await storage.GetProducts(ct);
+        bool doesCategoryExist = await categoriesStorage.DoesCategoryExist(command.CategoryId, ct);
+
+        if (!doesCategoryExist)
+        {
+            return new Error("Category doesn't exist");
+        }
+
+        if (!_productFields.Contains(command.OrderByField))
+        {
+            return new Error("Incorrect sort field!");
+        }
+
+        if (command.OrderDirection != "Ascending" && command.OrderDirection != "Descending")
+        {
+            return new Error("Invalid sort direction!");
+        }
+        
+        var sortDirection = command.OrderDirection == "Ascending" ? OrderByDirection.Ascending : OrderByDirection.Descending;
+        
+        int skip = command.PageSize * command.Page;
+        int take = command.PageSize;
+        
+        var products = await productsStorage
+            .GetProducts(command.CategoryId, skip, take, command.OrderByField, sortDirection, ct);
+        
+        // idk why implicit operator is not working here
+        return Result<IEnumerable<Product>>.Success(products);
     }
 }

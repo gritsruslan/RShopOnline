@@ -1,10 +1,19 @@
-﻿using RShopAPI_Test.Core.Models;
+﻿using RShopAPI_Test.Core.Enums;
+using RShopAPI_Test.Core.Models;
 
 namespace RShopAPI_Test.Storage.Interfaces;
 
 public interface IGetProductsStorage
 {
-    Task<IEnumerable<Product>> GetProducts(CancellationToken ct);
+    Task<IEnumerable<Product>> GetAllProducts(CancellationToken ct);
+    
+    Task<IEnumerable<Product>> GetProducts(
+        Guid categoryId, 
+        int skip, 
+        int take, 
+        string orderByField, 
+        OrderByDirection orderByDirection,  
+        CancellationToken ct);
     
     Task<Product?> GetProductById(Guid id, CancellationToken ct);
     
