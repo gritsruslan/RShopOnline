@@ -5,10 +5,11 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using RShopAPI_Test.Storage;
+using RShopOnline.API.Storage;
 
 #nullable disable
 
-namespace RShopAPI_Test.Storage.Migrations
+namespace RShopOnline.API.Storage.Migrations
 {
     [DbContext(typeof(RShopDbContext))]
     partial class RShopDbContextModelSnapshot : ModelSnapshot

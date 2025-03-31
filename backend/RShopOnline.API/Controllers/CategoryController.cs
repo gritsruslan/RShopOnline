@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using RShopAPI_Test.DTOs;
 using RShopAPI_Test.Services.Interfaces;
+using RShopAPI_Test.Services.UseCases.CreateCategory;
+using RShopAPI_Test.Services.UseCases.GetCatigoriesUseCase;
 
 namespace RShopAPI_Test.Controllers;
 

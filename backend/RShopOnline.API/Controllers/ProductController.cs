@@ -7,7 +7,7 @@ namespace RShopAPI_Test.Controllers;
 [Route("/api/products")]
 public class ProductController : ControllerBase
 {
-    [HttpGet]
+    [HttpGet] // TODO Pagination, filters and sorting
     public async Task<IActionResult> GetProducts()
     {
         throw new NotImplementedException();
@@ -27,12 +27,6 @@ public class ProductController : ControllerBase
 
     [HttpPut]
     public async Task<IActionResult> UpdateProduct([FromBody] UpdateProductRequest request, CancellationToken ct)
-    {
-        throw new NotImplementedException();
-    }
-
-    [HttpDelete("{id::guid}")]
-    public async Task<IActionResult> DeleteProduct([FromQuery] Guid id, CancellationToken ct)
     {
         throw new NotImplementedException();
     }

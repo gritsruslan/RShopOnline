@@ -1,8 +1,7 @@
 ﻿using RShopAPI_Test.Core.Models;
-using RShopAPI_Test.Services.Interfaces;
 using RShopAPI_Test.Storage.Interfaces;
 
-namespace RShopAPI_Test.Services.UseCases;
+namespace RShopAPI_Test.Services.UseCases.GetCatigoriesUseCase;
 
 public class GetCategoriesUseCase(IGetCategoriesStorage storage) : IGetCategoriesUseCase
 {

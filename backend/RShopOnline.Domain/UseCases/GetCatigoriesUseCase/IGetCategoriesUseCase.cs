@@ -1,6 +1,6 @@
 ﻿using RShopAPI_Test.Core.Models;
 
-namespace RShopAPI_Test.Services.Interfaces;
+namespace RShopAPI_Test.Services.UseCases.GetCatigoriesUseCase;
 
 public interface IGetCategoriesUseCase
 {

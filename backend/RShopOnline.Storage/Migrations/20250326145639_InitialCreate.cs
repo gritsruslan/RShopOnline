@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace RShopAPI_Test.Storage.Migrations
+namespace RShopOnline.API.Storage.Migrations
 {
     /// <inheritdoc />
     public partial class InitialCreate : Migration

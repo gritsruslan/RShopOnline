@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using RShopAPI_Test.Middlewares;
 using RShopAPI_Test.Services.Interfaces;
 using RShopAPI_Test.Services.UseCases;
+using RShopAPI_Test.Services.UseCases.CreateCategory;
+using RShopAPI_Test.Services.UseCases.GetCatigoriesUseCase;
 using RShopAPI_Test.Storage;
 using RShopAPI_Test.Storage.Interfaces;
 using RShopAPI_Test.Storage.Mapping;
