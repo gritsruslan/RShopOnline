@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <RootNamespace>RShopAPI_Test.Services</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\RShopOnline.Core\RShopOnline.Core.csproj" />
+      <ProjectReference Include="..\RShopOnline.Storage\RShopOnline.Storage.csproj" />
+    </ItemGroup>
+
+</Project>
