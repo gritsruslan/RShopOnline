@@ -10,9 +10,9 @@ public class CreateProductUseCase(ICreateProductStorage productStorage, IGetCate
     {
         var doesCategoryExist = await categoriesStorage.DoesCategoryExist(command.CategoryId, ct);
 
-        if (!doesCategoryExist) //TODO Result
+        if (!doesCategoryExist)
         {
-            throw new Exception("Category does not exist");
+            throw new Exception("Category does not exist");  //TODO Result
         }
         
         return await productStorage.CreateProduct(command.Name, command.Price, command.CategoryId, command.InStock,

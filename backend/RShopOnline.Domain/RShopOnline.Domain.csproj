@@ -12,4 +12,8 @@
       <ProjectReference Include="..\RShopOnline.Storage\RShopOnline.Storage.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Commands\" />
+    </ItemGroup>
+
 </Project>

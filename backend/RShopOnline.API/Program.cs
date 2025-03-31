@@ -1,10 +1,14 @@
 using System.Reflection;
 using Microsoft.EntityFrameworkCore;
+using RShopAPI_Test.Mapping;
 using RShopAPI_Test.Middlewares;
 using RShopAPI_Test.Services.Interfaces;
-using RShopAPI_Test.Services.UseCases;
 using RShopAPI_Test.Services.UseCases.CreateCategory;
+using RShopAPI_Test.Services.UseCases.CreateProduct;
 using RShopAPI_Test.Services.UseCases.GetCatigoriesUseCase;
+using RShopAPI_Test.Services.UseCases.GetProduct;
+using RShopAPI_Test.Services.UseCases.GetProducts;
+using RShopAPI_Test.Services.UseCases.UpdateProduct;
 using RShopAPI_Test.Storage;
 using RShopAPI_Test.Storage.Interfaces;
 using RShopAPI_Test.Storage.Mapping;
@@ -22,12 +26,23 @@ builder.Services.AddDbContext<RShopDbContext>(options =>
 });
 
 builder.Services.AddAutoMapper(Assembly.GetAssembly(typeof(CategoryProfile)));
+builder.Services.AddAutoMapper(Assembly.GetAssembly(typeof(CreateProductRequestProfile)));
 
 builder.Services.AddScoped<ICreateCategoryUseCase, CreateCategoryUseCase>();
 builder.Services.AddScoped<ICreateCategoryStorage, CreateCategoryStorage>();
 
 builder.Services.AddScoped<IGetCategoriesUseCase, GetCategoriesUseCase>();
 builder.Services.AddScoped<IGetCategoriesStorage, GetCategoriesStorage>();
+
+builder.Services.AddScoped<ICreateProductUseCase, CreateProductUseCase>();
+builder.Services.AddScoped<ICreateProductStorage, CreateProductStorage>();
+
+builder.Services.AddScoped<IGetProductUseCase, GetProductUseCase>();
+builder.Services.AddScoped<IGetProductsUseCase, GetProductsUseCase>();
+builder.Services.AddScoped<IGetProductsStorage, GetProductsStorage>();
+
+builder.Services.AddScoped<IUpdateProductUseCase, UpdateProductUseCase>();
+builder.Services.AddScoped<IUpdateProductStorage, UpdateProductStorage>();
 
 var app = builder.Build();
 
