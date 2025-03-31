@@ -47,8 +47,12 @@ public class ProductController : ControllerBase
         [FromBody] CreateProductRequest request, 
         CancellationToken ct)
     {
-        var product = await useCase.Handle(mapper.Map<CreateProductCommand>(request), ct);
-        return Ok(product);
+        var result = await useCase.Handle(mapper.Map<CreateProductCommand>(request), ct);
+        
+        if(result.IsFailure)
+            return BadRequest(result.Error);
+        
+        return Ok(result.Value);
     }
 
     [HttpPut]
@@ -60,7 +64,11 @@ public class ProductController : ControllerBase
         [FromBody] UpdateProductRequest request, 
         CancellationToken ct)
     {
-        var newProduct = await useCase.Handle(mapper.Map<UpdateProductCommand>(request), ct);
-        return Ok(newProduct);
+        var result = await useCase.Handle(mapper.Map<UpdateProductCommand>(request), ct);
+        
+        if(result.IsFailure)
+            return BadRequest(result.Error);
+        
+        return Ok(result.Value);
     }
 }
