@@ -19,7 +19,7 @@ public class GetProductsStorage(RShopDbContext dbContext, IMapper mapper) : IGet
         Guid categoryId, 
         int skip, int take, 
         string orderByField, 
-        OrderByDirection orderByDirection, 
+        bool ascending, 
         CancellationToken ct)
     {
         var query = dbContext.Products.AsNoTracking()
@@ -35,7 +35,7 @@ public class GetProductsStorage(RShopDbContext dbContext, IMapper mapper) : IGet
             _ => throw new Exception("Invalid order field!")
         };
 
-        if (orderByDirection == OrderByDirection.Ascending)
+        if (ascending)
             query = query.OrderBy(orderByExpression);
         else
             query = query.OrderByDescending(orderByExpression);

@@ -14,7 +14,7 @@ namespace RShopAPI_Test.Controllers;
 [Route("/api/products")]
 public class ProductController : ControllerBase
 {
-    [HttpGet]
+    [HttpGet("all")]
     [ProducesResponseType<List<Product>>(200)]
     public async Task<IActionResult> GetAllProducts([FromServices] IGetAllProductsUseCase useCase, CancellationToken ct)
     {
@@ -24,14 +24,19 @@ public class ProductController : ControllerBase
 
     [HttpGet]
     [ProducesResponseType<List<Product>>( 200)]
-    [ProducesResponseType(400)]
+    [ProducesResponseType(404)]
     public async Task<IActionResult> GetProducts(
         [FromServices] IGetProductsUseCase useCase,
         [FromServices] IMapper mapper,
-        [FromBody] GetProductsRequest request, 
+        [FromQuery] Guid categoryId,
+        [FromQuery] int page,
+        [FromQuery] int pageSize,
+        [FromQuery] string orderBy,
+        [FromQuery] bool ascending,
         CancellationToken ct)
     {
-        var result = await useCase.Handle(mapper.Map<GetProductsCommand>(request), ct);
+        var getProductsCommand = new GetProductsCommand(categoryId, page, pageSize, orderBy, ascending);
+        var result = await useCase.Handle(getProductsCommand, ct);
 
         if (result.IsFailure)
             return BadRequest(result.Error);
@@ -47,17 +52,17 @@ public class ProductController : ControllerBase
         [FromRoute] Guid id, 
         CancellationToken ct)
     {
-        var product = await useCase.Handle(id, ct);
+        var result = await useCase.Handle(id, ct);
 
-        if (product is null)
+        if (result.IsFailure)
             return BadRequest();
         
-        return Ok(product);
+        return Ok(result.Value);
     }
 
     [HttpPost]
-    [ProducesResponseType<Product>(200)]
-    [ProducesResponseType(400)]
+    [ProducesResponseType<Product>(201)]
+    [ProducesResponseType(404)]
     public async Task<IActionResult> CreateProduct(
         [FromServices] IMapper mapper,
         [FromServices] ICreateProductUseCase useCase, 
@@ -73,8 +78,8 @@ public class ProductController : ControllerBase
     }
 
     [HttpPut]
-    [ProducesResponseType<Product>(200)]
-    [ProducesResponseType(400)]
+    [ProducesResponseType<Product>(204)]
+    [ProducesResponseType(404)]
     public async Task<IActionResult> UpdateProduct(
         [FromServices] IMapper mapper,
         [FromServices] IUpdateProductUseCase useCase, 

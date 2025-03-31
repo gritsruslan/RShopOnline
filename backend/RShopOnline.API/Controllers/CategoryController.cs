@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using RShopAPI_Test.Core.Models;
 using RShopAPI_Test.DTOs;
 using RShopAPI_Test.Services.UseCases.CreateCategory;
 using RShopAPI_Test.Services.UseCases.GetCatigoriesUseCase;
@@ -10,6 +11,7 @@ namespace RShopAPI_Test.Controllers;
 public class CategoryController : ControllerBase
 {
     [HttpPost]
+    [ProducesResponseType<Category>(201)]
     public async Task<IActionResult> CreateCategory(
         [FromServices] ICreateCategoryUseCase useCase, 
         CreateCategoryRequest request, 
@@ -20,6 +22,7 @@ public class CategoryController : ControllerBase
     }
 
     [HttpGet]
+    [ProducesResponseType<List<Category>>(200)]
     public async Task<IActionResult> GetAllCategories(
         [FromServices] IGetCategoriesUseCase useCase, 
         CancellationToken ct)

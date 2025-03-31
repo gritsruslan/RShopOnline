@@ -43,6 +43,8 @@ builder.Services.AddScoped<IGetProductsStorage, GetProductsStorage>();
 builder.Services.AddScoped<IUpdateProductUseCase, UpdateProductUseCase>();
 builder.Services.AddScoped<IUpdateProductStorage, UpdateProductStorage>();
 
+builder.Services.AddScoped<IGetProductsUseCase, GetProductsUseCase>();
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())

@@ -12,7 +12,7 @@ public interface IGetProductsStorage
         int skip, 
         int take, 
         string orderByField, 
-        OrderByDirection orderByDirection,  
+        bool ascending,  
         CancellationToken ct);
     
     Task<Product?> GetProductById(Guid id, CancellationToken ct);

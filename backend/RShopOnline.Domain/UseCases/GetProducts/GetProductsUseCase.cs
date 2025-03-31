@@ -26,18 +26,21 @@ public class GetProductsUseCase(
             return new Error("Incorrect sort field!");
         }
 
-        if (command.OrderDirection != "Ascending" && command.OrderDirection != "Descending")
+        if (command.Page <= 0)
         {
-            return new Error("Invalid sort direction!");
+            return new Error("Incorrect page number!");
+        }
+
+        if (command.PageSize <= 0)
+        {
+            return new Error("Incorrect page size!");
         }
         
-        var sortDirection = command.OrderDirection == "Ascending" ? OrderByDirection.Ascending : OrderByDirection.Descending;
-        
-        int skip = command.PageSize * command.Page;
+        int skip = (command.Page - 1) * command.PageSize;
         int take = command.PageSize;
         
         var products = await productsStorage
-            .GetProducts(command.CategoryId, skip, take, command.OrderByField, sortDirection, ct);
+            .GetProducts(command.CategoryId, skip, take, command.OrderByField, command.Ascending, ct);
         
         // idk why implicit operator is not working here
         return Result<IEnumerable<Product>>.Success(products);
