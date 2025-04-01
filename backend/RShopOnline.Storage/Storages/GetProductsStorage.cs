@@ -1,7 +1,6 @@
 ﻿using System.Linq.Expressions;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
-using RShopAPI_Test.Core.Enums;
 using RShopAPI_Test.Core.Models;
 using RShopAPI_Test.Storage.Entities;
 using RShopAPI_Test.Storage.Interfaces;
