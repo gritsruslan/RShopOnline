@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using RShopAPI_Test.DTOs;
+using RShopAPI_Test.Services.UseCases.LoginUseCase;
 using RShopAPI_Test.Services.UseCases.Registration;
 
 namespace RShopAPI_Test.Controllers;
@@ -10,9 +11,20 @@ namespace RShopAPI_Test.Controllers;
 public class AuthController : ControllerBase 
 {
     [HttpPost("login")]
-    public async Task<IActionResult> Login()
+    public async Task<IActionResult> Login(
+        [FromServices] ILoginUseCase useCase,
+        [FromBody] LoginRequest request,
+        IMapper mapper,
+        CancellationToken ct)
     {
-        throw new NotImplementedException();
+        var result = await useCase.Handle(mapper.Map<LoginCommand>(request), ct);
+
+        if (result.IsFailure)
+        {
+            return BadRequest(result.Error);
+        }
+
+        return Ok(new { jwt = result.Value });
     }
 
 

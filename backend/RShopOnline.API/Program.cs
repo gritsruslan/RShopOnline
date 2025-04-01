@@ -3,12 +3,14 @@ using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using RShopAPI_Test.Mapping;
 using RShopAPI_Test.Middlewares;
+using RShopAPI_Test.Services.Jwt;
 using RShopAPI_Test.Services.Security;
 using RShopAPI_Test.Services.UseCases.CreateCategory;
 using RShopAPI_Test.Services.UseCases.CreateProduct;
 using RShopAPI_Test.Services.UseCases.GetCatigoriesUseCase;
 using RShopAPI_Test.Services.UseCases.GetProduct;
 using RShopAPI_Test.Services.UseCases.GetProducts;
+using RShopAPI_Test.Services.UseCases.LoginUseCase;
 using RShopAPI_Test.Services.UseCases.Registration;
 using RShopAPI_Test.Services.UseCases.UpdateProduct;
 using RShopAPI_Test.Services.Validators;
@@ -56,6 +58,11 @@ builder.Services.AddScoped<ICreateUserStorage, CreateUserStorage>();
 
 builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
 builder.Services.AddScoped<ISaltGenerator, SaltGenerator>();
+
+builder.Services.AddScoped<ILoginUseCase, LoginUseCase>();
+
+builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
+builder.Services.Configure<AuthSettings>(builder.Configuration.GetSection("AuthSettings"));
 
 
 var app = builder.Build();

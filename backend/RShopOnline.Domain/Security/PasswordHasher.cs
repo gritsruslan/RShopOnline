@@ -8,6 +8,6 @@ public class PasswordHasher : IPasswordHasher
          KeyDerivation.Pbkdf2(password, salt, KeyDerivationPrf.HMACSHA256, 5000, 32);
 
     public bool VerifyPassword(string password, byte[] passwordHash, byte[] salt) =>
-         HashPassword(password, salt).Equals(passwordHash);
+         HashPassword(password, salt).SequenceEqual(passwordHash);
 
 }
