@@ -8,11 +8,11 @@ namespace RShopAPI_Test.Storage;
 public class RShopDbContext(DbContextOptions<RShopDbContext> options) : DbContext(options)
 {
     public DbSet<ProductEntity> Products { get; set; }
-    
+
     public DbSet<CategoryEntity> Categories { get; set; }
-    
+
     public DbSet<UserEntity> Users { get; set; }
-    
+
     public DbSet<OrderEntity> Orders { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
