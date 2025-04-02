@@ -7,25 +7,26 @@ using RShopAPI_Test.Core.Models;
 
 namespace RShopAPI_Test.Services.Jwt;
 
-public class JwtTokenService(IOptions<AuthSettings> options) : IJwtTokenService
+public class JwtProvider(IOptions<JwtOptions> options) : IJwtProvider
 {
     public string GenerateToken(User user)
     {
         List<Claim> claims =
         [
             new("userId", user.Id.ToString()),
-            new("email", user.Email),
             new("userRole", user.Role.ToString()),
         ];
 
+        var signingCredentials = new SigningCredentials(
+            new SymmetricSecurityKey(Encoding.ASCII.GetBytes(options.Value.SecretKey)),
+            SecurityAlgorithms.HmacSha256Signature);
+
         var jwtToken = new JwtSecurityToken(
-            expires: DateTime.UtcNow.Add(options.Value.Expires),
             claims: claims,
             issuer: options.Value.Issuer,
             audience: options.Value.Audience,
-            signingCredentials: new SigningCredentials(
-                new SymmetricSecurityKey(Encoding.ASCII.GetBytes(options.Value.SecretKey)),
-                SecurityAlgorithms.HmacSha256Signature)
+            expires: DateTime.UtcNow.AddHours(options.Value.ExpiresHours),
+            signingCredentials: signingCredentials
             );
         
         return new JwtSecurityTokenHandler().WriteToken(jwtToken);

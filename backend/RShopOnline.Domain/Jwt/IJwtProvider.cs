@@ -2,7 +2,7 @@
 
 namespace RShopAPI_Test.Services.Jwt;
 
-public interface IJwtTokenService
+public interface IJwtProvider
 {
     string GenerateToken(User user);
 }

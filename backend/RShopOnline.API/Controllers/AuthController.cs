@@ -11,6 +11,8 @@ namespace RShopAPI_Test.Controllers;
 public class AuthController : ControllerBase 
 {
     [HttpPost("login")]
+    [ProducesResponseType(200)]
+    [ProducesResponseType(400)]
     public async Task<IActionResult> Login(
         [FromServices] ILoginUseCase useCase,
         [FromBody] LoginRequest request,
@@ -23,8 +25,10 @@ public class AuthController : ControllerBase
         {
             return BadRequest(result.Error);
         }
-
-        return Ok(new { jwt = result.Value });
+       
+        HttpContext.Response.Cookies.Append("my-cookies", result.Value);
+        
+        return Ok();
     }
 
 

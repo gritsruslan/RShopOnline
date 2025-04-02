@@ -1,6 +1,9 @@
 using System.Reflection;
+using System.Text;
 using FluentValidation;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using RShopAPI_Test.Mapping;
 using RShopAPI_Test.Middlewares;
 using RShopAPI_Test.Services.Jwt;
@@ -61,9 +64,36 @@ builder.Services.AddScoped<ISaltGenerator, SaltGenerator>();
 
 builder.Services.AddScoped<ILoginUseCase, LoginUseCase>();
 
-builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
-builder.Services.Configure<AuthSettings>(builder.Configuration.GetSection("AuthSettings"));
+builder.Services.AddScoped<IJwtProvider, JwtProvider>();
+builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection("JwtOptions"));
 
+var jwtOptions = builder.Configuration.GetRequiredSection("JwtOptions").Get<JwtOptions>()!;
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
+    {
+        options.TokenValidationParameters = new()
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = jwtOptions.Issuer,
+            ValidAudience = jwtOptions.Audience,
+            IssuerSigningKey = new SymmetricSecurityKey(
+                Encoding.ASCII.GetBytes(jwtOptions.SecretKey)),
+        };
+
+        options.Events = new JwtBearerEvents
+        {
+            OnMessageReceived = context =>
+            {
+                context.Token = context.Request.Cookies["my-cookies"];
+                return Task.CompletedTask;
+            }
+        };
+    });
+
+builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
@@ -78,5 +108,8 @@ app.UseMiddleware<GlobalExceptionHandler>();
 app.UseHttpsRedirection();
 
 app.MapControllers();
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.Run();

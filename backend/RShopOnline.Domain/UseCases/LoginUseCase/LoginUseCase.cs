@@ -9,7 +9,7 @@ namespace RShopAPI_Test.Services.UseCases.LoginUseCase;
 public class LoginUseCase(
     IGetUserStorage storage,
     IPasswordHasher passwordHasher,
-    IJwtTokenService jwtTokenService,
+    IJwtProvider jwtProvider,
     IValidator<LoginCommand> validator) : ILoginUseCase
 {
     public async Task<Result<string>> Handle(LoginCommand command, CancellationToken ct)
@@ -36,6 +36,6 @@ public class LoginUseCase(
             return new Error(errorMessage);
         }
 
-        return jwtTokenService.GenerateToken(candidate);
+        return jwtProvider.GenerateToken(candidate);
     }
 }
