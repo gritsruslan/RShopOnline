@@ -15,4 +15,6 @@ public class ProductEntity
     public Guid CategoryId { get; set; }
     
     public CategoryEntity Category { get; set; } = null!;
+    
+    public ICollection<OrderEntity> Orders { get; set; } = null!;
 }

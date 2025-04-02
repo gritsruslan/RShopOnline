@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Reflection;
+using Microsoft.EntityFrameworkCore;
 using RShopAPI_Test.Storage.Configurations;
 using RShopAPI_Test.Storage.Entities;
 
@@ -16,10 +17,7 @@ public class RShopDbContext(DbContextOptions<RShopDbContext> options) : DbContex
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.ApplyConfiguration(new ProductEntityConfiguration());
-        modelBuilder.ApplyConfiguration(new CategoryEntityConfiguration());
-        modelBuilder.ApplyConfiguration(new UserEntityConfiguration());
-        modelBuilder.ApplyConfiguration(new OrderEntityConfiguration());
+        modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetAssembly(typeof(UserEntityConfiguration))!);
         base.OnModelCreating(modelBuilder);
     }
 }

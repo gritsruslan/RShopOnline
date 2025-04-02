@@ -18,10 +18,13 @@ public class ProductEntityConfiguration : IEntityTypeConfiguration<ProductEntity
         
         builder.Property(x => x.Price).HasPrecision(18, 2);
         
-        builder.Property(x => x.Price);
-        
         builder.HasOne(p => p.Category)
             .WithMany(c => c.Products)
             .HasForeignKey(p => p.CategoryId);
+        
+        builder
+            .HasMany(p => p.Orders)
+            .WithMany(o => o.Products)
+            .UsingEntity(e => e.ToTable("OrderProducts"));
     }
 }

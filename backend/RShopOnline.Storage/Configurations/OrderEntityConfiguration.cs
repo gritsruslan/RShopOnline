@@ -14,8 +14,14 @@ public class OrderEntityConfiguration : IEntityTypeConfiguration<OrderEntity>
 
         builder.Property(x => x.Status).HasConversion<int>();
         
-        builder.HasOne<UserEntity>(x => x.User)
+        builder
+            .HasOne(x => x.User)
             .WithMany(x => x.Orders)
             .HasForeignKey(x => x.UserId);
+        
+        builder
+            .HasMany(o => o.Products)
+            .WithMany(p => p.Orders)
+            .UsingEntity(e => e.ToTable("OrderProducts"));
     }
 }
