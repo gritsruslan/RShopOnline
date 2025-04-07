@@ -14,5 +14,5 @@ public class User
 
     public required byte[] Salt { get; set; }
     
-    public UserRole Role { get; set; }
+    public Role Role { get; set; }
 }

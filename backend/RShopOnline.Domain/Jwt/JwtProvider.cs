@@ -14,7 +14,6 @@ public class JwtProvider(IOptions<JwtOptions> options) : IJwtProvider
         List<Claim> claims =
         [
             new("userId", user.Id.ToString()),
-            new("userRole", user.Role.ToString()),
         ];
 
         var signingCredentials = new SigningCredentials(

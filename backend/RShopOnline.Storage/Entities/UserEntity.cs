@@ -14,7 +14,7 @@ public class UserEntity
 
     public byte[] Salt { get; set; } = null!;
     
-    public UserRole Role { get; set; }
+    public Role Role { get; set; }
     
     public ICollection<OrderEntity> Orders { get; set; } = null!;
 }

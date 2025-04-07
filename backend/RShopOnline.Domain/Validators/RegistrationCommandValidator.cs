@@ -1,5 +1,5 @@
 ﻿using FluentValidation;
-using RShopAPI_Test.Services.UseCases.Registration;
+using RShopAPI_Test.Services.Commands;
 
 namespace RShopAPI_Test.Services.Validators;
 

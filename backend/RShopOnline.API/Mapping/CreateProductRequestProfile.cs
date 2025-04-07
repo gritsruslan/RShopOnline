@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using RShopAPI_Test.Core.Models;
 using RShopAPI_Test.DTOs;
 using RShopAPI_Test.Services.Commands;
 

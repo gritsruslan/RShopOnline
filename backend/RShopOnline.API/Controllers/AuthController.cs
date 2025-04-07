@@ -1,25 +1,25 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RShopAPI_Test.DTOs;
-using RShopAPI_Test.Services.UseCases.LoginUseCase;
-using RShopAPI_Test.Services.UseCases.Registration;
+using RShopAPI_Test.Services.Commands;
+using RShopAPI_Test.Services.Interfaces;
 
 namespace RShopAPI_Test.Controllers;
 
 [ApiController]
 [Route("/api/auth")]
-public class AuthController : ControllerBase 
+public class AuthController(IAuthService service) : ControllerBase 
 {
     [HttpPost("login")]
     [ProducesResponseType(200)]
     [ProducesResponseType(400)]
     public async Task<IActionResult> Login(
-        [FromServices] ILoginUseCase useCase,
         [FromBody] LoginRequest request,
         IMapper mapper,
         CancellationToken ct)
     {
-        var result = await useCase.Handle(mapper.Map<LoginCommand>(request), ct);
+        var result = await service.Login(mapper.Map<LoginCommand>(request), ct);
 
         if (result.IsFailure)
         {
@@ -36,12 +36,11 @@ public class AuthController : ControllerBase
     [ProducesResponseType(200)]
     [ProducesResponseType(400)]
     public async Task<IActionResult> Register(
-        [FromServices] IRegistrationUseCase useCase,
         [FromServices] IMapper mapper,
         [FromBody] RegistrationRequest request, 
         CancellationToken ct)
     {
-        var result = await useCase.Handle(mapper.Map<RegistrationCommand>(request), ct);
+        var result = await service.Registration(mapper.Map<RegistrationCommand>(request), ct);
 
         if (result.IsFailure)
         {
@@ -53,7 +52,8 @@ public class AuthController : ControllerBase
 
 
     [HttpPost("changepassword")]
-    public async Task<IActionResult> ChangePassword()
+    [Authorize]
+    public Task<IActionResult> ChangePassword()
     {
         throw new NotImplementedException();
     }

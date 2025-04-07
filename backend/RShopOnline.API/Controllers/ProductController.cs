@@ -1,24 +1,24 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using RShopAPI_Test.Core.Enums;
 using RShopAPI_Test.Core.Models;
 using RShopAPI_Test.DTOs;
+using RShopAPI_Test.Services.Auth;
 using RShopAPI_Test.Services.Commands;
-using RShopAPI_Test.Services.UseCases.CreateProduct;
-using RShopAPI_Test.Services.UseCases.GetProduct;
-using RShopAPI_Test.Services.UseCases.GetProducts;
-using RShopAPI_Test.Services.UseCases.UpdateProduct;
+using RShopAPI_Test.Services.Interfaces;
 
 namespace RShopAPI_Test.Controllers;
 
 [ApiController]
 [Route("/api/products")]
-public class ProductController : ControllerBase
+public class ProductController(IProductService service) : ControllerBase
 {
     [HttpGet("all")]
     [ProducesResponseType<List<Product>>(200)]
-    public async Task<IActionResult> GetAllProducts([FromServices] IGetAllProductsUseCase useCase, CancellationToken ct)
+    public async Task<IActionResult> GetAllProducts(
+        CancellationToken ct)
     {
-        var products = await useCase.Handle(ct);
+        var products = await service.GetAllProducts(ct);
         return Ok(products);
     }
 
@@ -26,7 +26,6 @@ public class ProductController : ControllerBase
     [ProducesResponseType<List<Product>>( 200)]
     [ProducesResponseType(404)]
     public async Task<IActionResult> GetProducts(
-        [FromServices] IGetProductsUseCase useCase,
         [FromServices] IMapper mapper,
         [FromQuery] Guid categoryId,
         [FromQuery] int page,
@@ -36,8 +35,8 @@ public class ProductController : ControllerBase
         CancellationToken ct)
     {
         var getProductsCommand = new GetProductsCommand(categoryId, page, pageSize, orderBy, ascending);
-        var result = await useCase.Handle(getProductsCommand, ct);
-
+        var result = await service.GetProducts(getProductsCommand, ct);
+        
         if (result.IsFailure)
             return BadRequest(result.Error);
 
@@ -48,11 +47,10 @@ public class ProductController : ControllerBase
     [ProducesResponseType<Product>(200)]
     [ProducesResponseType(404)]
     public async Task<IActionResult> GetProduct(
-        [FromServices] IGetProductUseCase useCase, 
         [FromRoute] Guid id, 
         CancellationToken ct)
     {
-        var result = await useCase.Handle(id, ct);
+        var result = await service.GetProduct(id, ct);
 
         if (result.IsFailure)
             return BadRequest();
@@ -61,15 +59,15 @@ public class ProductController : ControllerBase
     }
 
     [HttpPost]
+    [RequireRole(Role.Admin, Role.Manager)]
     [ProducesResponseType<Product>(201)]
     [ProducesResponseType(404)]
     public async Task<IActionResult> CreateProduct(
         [FromServices] IMapper mapper,
-        [FromServices] ICreateProductUseCase useCase, 
         [FromBody] CreateProductRequest request, 
         CancellationToken ct)
     {
-        var result = await useCase.Handle(mapper.Map<CreateProductCommand>(request), ct);
+        var result = await service.CreateProduct(mapper.Map<CreateProductCommand>(request), ct);
         
         if(result.IsFailure)
             return BadRequest(result.Error);
@@ -78,15 +76,15 @@ public class ProductController : ControllerBase
     }
 
     [HttpPut]
+    [RequireRole(Role.Admin, Role.Manager)]
     [ProducesResponseType<Product>(204)]
     [ProducesResponseType(404)]
     public async Task<IActionResult> UpdateProduct(
         [FromServices] IMapper mapper,
-        [FromServices] IUpdateProductUseCase useCase, 
         [FromBody] UpdateProductRequest request, 
         CancellationToken ct)
     {
-        var result = await useCase.Handle(mapper.Map<UpdateProductCommand>(request), ct);
+        var result = await service.UpdateProduct(mapper.Map<UpdateProductCommand>(request), ct);
         
         if(result.IsFailure)
             return BadRequest(result.Error);

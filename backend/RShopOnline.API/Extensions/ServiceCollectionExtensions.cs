@@ -2,24 +2,20 @@
 using System.Text;
 using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using RShopAPI_Test.Mapping;
+using RShopAPI_Test.Services.Auth;
+using RShopAPI_Test.Services.Interfaces;
 using RShopAPI_Test.Services.Jwt;
 using RShopAPI_Test.Services.Security;
-using RShopAPI_Test.Services.UseCases.CreateCategory;
-using RShopAPI_Test.Services.UseCases.CreateProduct;
-using RShopAPI_Test.Services.UseCases.GetCatigoriesUseCase;
-using RShopAPI_Test.Services.UseCases.GetProduct;
-using RShopAPI_Test.Services.UseCases.GetProducts;
-using RShopAPI_Test.Services.UseCases.LoginUseCase;
-using RShopAPI_Test.Services.UseCases.Registration;
-using RShopAPI_Test.Services.UseCases.UpdateProduct;
+using RShopAPI_Test.Services.Services;
 using RShopAPI_Test.Services.Validators;
 using RShopAPI_Test.Storage;
 using RShopAPI_Test.Storage.Interfaces;
 using RShopAPI_Test.Storage.Mapping;
-using RShopAPI_Test.Storage.Storages;
+using RShopAPI_Test.Storage.Repositories;
 
 namespace RShopAPI_Test.Extensions;
 
@@ -47,29 +43,20 @@ public static class ServiceCollectionExtensions
         return services;
     }
 
-    public static IServiceCollection AddUseCases(this IServiceCollection services)
+    public static IServiceCollection AddServices(this IServiceCollection services)
     {
-        services.AddScoped<ICreateCategoryUseCase, CreateCategoryUseCase>();
-        services.AddScoped<IGetCategoriesUseCase, GetCategoriesUseCase>();
-        services.AddScoped<ICreateProductUseCase, CreateProductUseCase>();
-        services.AddScoped<IGetProductUseCase, GetProductUseCase>();
-        services.AddScoped<IGetAllProductsUseCase, GetAllProductsUseCase>();
-        services.AddScoped<IUpdateProductUseCase, UpdateProductUseCase>();
-        services.AddScoped<IGetProductsUseCase, GetProductsUseCase>();
-        services.AddScoped<IRegistrationUseCase, RegistrationUseCase>();
-        services.AddScoped<ILoginUseCase, LoginUseCase>();
+        services.AddScoped<IAuthService, AuthService>();
+        services.AddScoped<ICategoryService, CategoryService>();
+        services.AddScoped<IProductService, ProductService>();
+        services.AddScoped<IRoleService, RoleService>();
         return services;
     }
 
-    public static IServiceCollection AddStorages(this IServiceCollection services)
+    public static IServiceCollection AddRepositories(this IServiceCollection services)
     {
-        services.AddScoped<ICreateCategoryStorage, CreateCategoryStorage>();
-        services.AddScoped<IGetCategoriesStorage, GetCategoriesStorage>();
-        services.AddScoped<ICreateProductStorage, CreateProductStorage>();
-        services.AddScoped<IGetProductsStorage, GetProductsStorage>();
-        services.AddScoped<IUpdateProductStorage, UpdateProductStorage>();
-        services.AddScoped<IGetUserStorage, GetUserStorage>();
-        services.AddScoped<ICreateUserStorage, CreateUserStorage>();
+        services.AddScoped<ICategoriesRepository, CategoriesRepository>();
+        services.AddScoped<IUsersRepository, UsersRepository>();
+        services.AddScoped<IProductsRepository, ProductsRepository>();
         return services;
     }
 
@@ -80,7 +67,7 @@ public static class ServiceCollectionExtensions
         return services;
     }
 
-    public static IServiceCollection AddJwtAuthentication(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddApiAuthentication(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddScoped<IJwtProvider, JwtProvider>();
         services.Configure<JwtOptions>(configuration.GetSection("JwtOptions"));
@@ -114,9 +101,11 @@ public static class ServiceCollectionExtensions
         return services;
     }
 
-    public static IServiceCollection AddJwtAuthorization(this IServiceCollection services)
+    public static IServiceCollection AddApiAuthorization(this IServiceCollection services)
     {
         services.AddAuthorization();
+        services.AddScoped<IAuthorizationHandler, RoleAuthorizationHandler>();
+        services.AddSingleton<IAuthorizationPolicyProvider, RolePolicyProvider>();
         return services;
     }
 }

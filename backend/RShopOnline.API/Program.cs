@@ -11,11 +11,11 @@ builder.Services.AddControllers();
 builder.Services.AddDatabase(configuration);
 builder.Services.AddValidators();
 builder.Services.AddAutoMapping();
-builder.Services.AddUseCases();
-builder.Services.AddStorages();
+builder.Services.AddServices();
+builder.Services.AddRepositories();
 builder.Services.AddSecurity();
-builder.Services.AddJwtAuthentication(configuration);
-builder.Services.AddAuthorization();
+builder.Services.AddApiAuthentication(configuration);
+builder.Services.AddApiAuthorization();
 
 var app = builder.Build();
 
@@ -28,6 +28,7 @@ if (app.Environment.IsDevelopment())
 app.UseMiddleware<GlobalExceptionHandler>();
 app.UseHttpsRedirection();
 app.MapControllers();
+
 app.UseAuthentication();
 app.UseAuthorization();
 
