@@ -22,21 +22,6 @@ namespace RShopOnline.API.Storage.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("OrderEntityProductEntity", b =>
-                {
-                    b.Property<Guid>("OrdersId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("ProductsId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("OrdersId", "ProductsId");
-
-                    b.HasIndex("ProductsId");
-
-                    b.ToTable("OrderProducts", (string)null);
-                });
-
             modelBuilder.Entity("RShopAPI_Test.Storage.Entities.CategoryEntity", b =>
                 {
                     b.Property<Guid>("Id")
@@ -60,6 +45,9 @@ namespace RShopOnline.API.Storage.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<int>("Status")
                         .HasColumnType("integer");
 
@@ -73,6 +61,28 @@ namespace RShopOnline.API.Storage.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Orders");
+                });
+
+            modelBuilder.Entity("RShopAPI_Test.Storage.Entities.OrderItemEntity", b =>
+                {
+                    b.Property<Guid>("ProductId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("OrderId")
+                        .HasColumnType("uuid");
+
+                    b.Property<decimal>("PriceAtOrderTime")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("integer");
+
+                    b.HasKey("ProductId", "OrderId");
+
+                    b.HasIndex("OrderId");
+
+                    b.ToTable("OrderItems");
                 });
 
             modelBuilder.Entity("RShopAPI_Test.Storage.Entities.ProductEntity", b =>
@@ -144,21 +154,6 @@ namespace RShopOnline.API.Storage.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("OrderEntityProductEntity", b =>
-                {
-                    b.HasOne("RShopAPI_Test.Storage.Entities.OrderEntity", null)
-                        .WithMany()
-                        .HasForeignKey("OrdersId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("RShopAPI_Test.Storage.Entities.ProductEntity", null)
-                        .WithMany()
-                        .HasForeignKey("ProductsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("RShopAPI_Test.Storage.Entities.OrderEntity", b =>
                 {
                     b.HasOne("RShopAPI_Test.Storage.Entities.UserEntity", "User")
@@ -168,6 +163,25 @@ namespace RShopOnline.API.Storage.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("RShopAPI_Test.Storage.Entities.OrderItemEntity", b =>
+                {
+                    b.HasOne("RShopAPI_Test.Storage.Entities.OrderEntity", "Order")
+                        .WithMany("OrderItems")
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("RShopAPI_Test.Storage.Entities.ProductEntity", "Product")
+                        .WithMany("OrderItems")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Order");
+
+                    b.Navigation("Product");
                 });
 
             modelBuilder.Entity("RShopAPI_Test.Storage.Entities.ProductEntity", b =>
@@ -184,6 +198,16 @@ namespace RShopOnline.API.Storage.Migrations
             modelBuilder.Entity("RShopAPI_Test.Storage.Entities.CategoryEntity", b =>
                 {
                     b.Navigation("Products");
+                });
+
+            modelBuilder.Entity("RShopAPI_Test.Storage.Entities.OrderEntity", b =>
+                {
+                    b.Navigation("OrderItems");
+                });
+
+            modelBuilder.Entity("RShopAPI_Test.Storage.Entities.ProductEntity", b =>
+                {
+                    b.Navigation("OrderItems");
                 });
 
             modelBuilder.Entity("RShopAPI_Test.Storage.Entities.UserEntity", b =>

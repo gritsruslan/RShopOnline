@@ -1,0 +1,13 @@
+﻿using AutoMapper;
+using RShopAPI_Test.DTOs;
+using RShopAPI_Test.Services.Commands;
+
+namespace RShopAPI_Test.Mapping;
+
+public class UpdateOrderStatusRequestProfile : Profile
+{
+    public UpdateOrderStatusRequestProfile()
+    {
+        CreateMap<UpdateOrderStatusCommand, UpdateOrderStatusRequest>().ReverseMap();
+    }
+}

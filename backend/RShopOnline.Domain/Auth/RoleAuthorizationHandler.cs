@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using RShopAPI_Test.Core.Enums;
 using RShopAPI_Test.Services.Interfaces;
+using RShopAPI_Test.Services.Jwt;
 
 namespace RShopAPI_Test.Services.Auth;
 
@@ -11,7 +12,7 @@ public class RoleAuthorizationHandler(IServiceScopeFactory scopeFactory) : Autho
         AuthorizationHandlerContext context, 
         RoleRequirements requirement)
     {
-        var userIdClaim = context.User.Claims.FirstOrDefault(c => c.Type == "userId");
+        var userIdClaim = context.User.Claims.FirstOrDefault(c => c.Type == JwtClaims.UserId);
 
         if (userIdClaim == null || !Guid.TryParse(userIdClaim.Value, out Guid userId))
         {

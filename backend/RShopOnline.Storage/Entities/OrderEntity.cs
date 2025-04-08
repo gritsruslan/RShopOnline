@@ -11,6 +11,9 @@ public class OrderEntity
     public UserEntity User { get; set; } = null!;
     
     public OrderStatus Status { get; set; }
-
-    public ICollection<ProductEntity> Products { get; set; } = null!;
+    
+    
+    public DateTimeOffset CreatedAt { get; set; }
+    
+    public ICollection<OrderItemEntity> OrderItems { get; set; } = null!;
 }

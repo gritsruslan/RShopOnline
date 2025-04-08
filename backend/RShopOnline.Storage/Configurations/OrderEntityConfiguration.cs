@@ -20,8 +20,8 @@ public class OrderEntityConfiguration : IEntityTypeConfiguration<OrderEntity>
             .HasForeignKey(x => x.UserId);
         
         builder
-            .HasMany(o => o.Products)
-            .WithMany(p => p.Orders)
-            .UsingEntity(e => e.ToTable("OrderProducts"));
+            .HasMany(o => o.OrderItems)
+            .WithOne(i => i.Order)
+            .HasForeignKey(i => i.OrderId);
     }
 }

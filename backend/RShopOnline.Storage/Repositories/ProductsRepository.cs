@@ -14,6 +14,14 @@ public class ProductsRepository(RShopDbContext dbContext, IMapper mapper) : IPro
         return await dbContext.Products.AsNoTracking().Select(p => mapper.Map<Product>(p)).ToListAsync(ct);
     }
 
+    public async Task<IEnumerable<Product>> GetProductsByIds(IReadOnlyCollection<Guid> ids, CancellationToken ct)
+    {
+        return await dbContext.Products.AsNoTracking()
+            .Where(p => ids.Contains(p.Id))
+            .Select(p => mapper.Map<Product>(p))
+            .ToListAsync(ct);
+    }
+
     public async Task<IEnumerable<Product>> GetProducts(
         Guid categoryId, 
         int skip, int take, 

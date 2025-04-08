@@ -14,6 +14,7 @@ public interface IProductsRepository
     
     Task<IEnumerable<Product>> GetAllProducts(CancellationToken ct);
     
+    Task<IEnumerable<Product>> GetProductsByIds(IReadOnlyCollection<Guid> ids, CancellationToken ct);
     
     Task<IEnumerable<Product>> GetProducts(
         Guid categoryId, 

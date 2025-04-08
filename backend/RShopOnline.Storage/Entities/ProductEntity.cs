@@ -16,5 +16,6 @@ public class ProductEntity
     
     public CategoryEntity Category { get; set; } = null!;
     
-    public ICollection<OrderEntity> Orders { get; set; } = null!;
+    
+    public ICollection<OrderItemEntity> OrderItems { get; set; } = null!;
 }

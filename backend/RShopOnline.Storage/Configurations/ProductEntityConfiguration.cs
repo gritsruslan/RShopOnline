@@ -23,8 +23,7 @@ public class ProductEntityConfiguration : IEntityTypeConfiguration<ProductEntity
             .HasForeignKey(p => p.CategoryId);
         
         builder
-            .HasMany(p => p.Orders)
-            .WithMany(o => o.Products)
-            .UsingEntity(e => e.ToTable("OrderProducts"));
+            .HasMany(p => p.OrderItems)
+            .WithOne(o => o.Product);
     }
 }

@@ -14,6 +14,8 @@ public class RShopDbContext(DbContextOptions<RShopDbContext> options) : DbContex
     public DbSet<UserEntity> Users { get; set; }
 
     public DbSet<OrderEntity> Orders { get; set; }
+    
+    public DbSet<OrderItemEntity> OrderItems { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

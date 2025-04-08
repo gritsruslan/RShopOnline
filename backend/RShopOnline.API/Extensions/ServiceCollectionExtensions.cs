@@ -49,6 +49,8 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ICategoryService, CategoryService>();
         services.AddScoped<IProductService, ProductService>();
         services.AddScoped<IRoleService, RoleService>();
+        services.AddScoped<IOrderService, OrderService>();
+        services.AddScoped<ICurrentUserService, CurrentUserService>();
         return services;
     }
 
@@ -57,6 +59,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ICategoriesRepository, CategoriesRepository>();
         services.AddScoped<IUsersRepository, UsersRepository>();
         services.AddScoped<IProductsRepository, ProductsRepository>();
+        services.AddScoped<IOrdersRepository, OrdersRepository>();
         return services;
     }
 
