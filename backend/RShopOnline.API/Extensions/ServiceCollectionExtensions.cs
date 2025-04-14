@@ -16,6 +16,8 @@ using RShopAPI_Test.Storage;
 using RShopAPI_Test.Storage.Interfaces;
 using RShopAPI_Test.Storage.Mapping;
 using RShopAPI_Test.Storage.Repositories;
+using Serilog;
+using Serilog.Filters;
 
 namespace RShopAPI_Test.Extensions;
 
@@ -27,6 +29,27 @@ public static class ServiceCollectionExtensions
         {
             options.UseNpgsql(configuration.GetConnectionString("Database"));
         });
+        return services;
+    }
+
+    public static IServiceCollection AddAppLogging(
+        this IServiceCollection services, 
+        IConfiguration configuration, 
+        string environmentName)
+    {
+        services.AddLogging(b => b.AddSerilog(
+            new LoggerConfiguration()
+                .MinimumLevel.Warning()
+                .Enrich.WithProperty("Application", "RShopOnline.API")
+                .Enrich.WithProperty("Environment", environmentName)
+                .WriteTo.Logger(
+                    lc => lc.Filter.ByExcluding(
+                        Matching.FromSource("Microsoft")).WriteTo.OpenSearch(
+                        configuration.GetConnectionString("Logs"),
+                        "rshop-logs-{0:dd.MM.yyyy}"))
+                .WriteTo.Logger(lc => lc.WriteTo.Console())
+                .CreateLogger()));
+
         return services;
     }
 

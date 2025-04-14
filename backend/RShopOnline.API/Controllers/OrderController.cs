@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using RShopAPI_Test.Core.Enums;
+using RShopAPI_Test.Core.Models;
 using RShopAPI_Test.DTOs;
 using RShopAPI_Test.Services.Auth;
 using RShopAPI_Test.Services.Commands;
@@ -13,6 +14,8 @@ namespace RShopAPI_Test.Controllers;
 public class OrderController(IOrderService service, IMapper mapper) : ControllerBase
 {
     [HttpGet("{id:guid}")]
+    [ProducesResponseType<Order>(200)]
+    [ProducesResponseType(400)]
     public async Task<IActionResult> GetOrderById([FromRoute] Guid id, CancellationToken ct)
     {
         var result = await service.GetOrderById(id, ct);
@@ -24,6 +27,8 @@ public class OrderController(IOrderService service, IMapper mapper) : Controller
     }
 
     [HttpGet("user")]
+    [ProducesResponseType<List<Order>>(200)]
+    [ProducesResponseType(400)]
     [RequireRole(Role.Customer)]
     public async Task<IActionResult> GetOrdersByCurrentUser(CancellationToken ct)
     {
@@ -32,6 +37,8 @@ public class OrderController(IOrderService service, IMapper mapper) : Controller
     }
     
     [HttpPost]
+    [ProducesResponseType<Order>(201)]
+    [ProducesResponseType(400)]
     [RequireRole(Role.Customer)]
     public async Task<IActionResult> CreateOrder([FromBody] CreateOrderRequest request, CancellationToken ct)
     {
@@ -44,6 +51,8 @@ public class OrderController(IOrderService service, IMapper mapper) : Controller
     }
 
     [HttpPut("cancel")]
+    [ProducesResponseType(200)]
+    [ProducesResponseType(400)]
     [RequireRole(Role.Customer)]
     public async Task<IActionResult> CancelOrder([FromRoute] Guid id, CancellationToken ct)
     {
@@ -56,6 +65,8 @@ public class OrderController(IOrderService service, IMapper mapper) : Controller
     }
 
     [HttpPut]
+    [ProducesResponseType(200)]
+    [ProducesResponseType(400)]
     [RequireRole(Role.Manager, Role.Admin)]
     public async Task<IActionResult> UpdateOrderStatus([FromBody] UpdateOrderStatusRequest request, CancellationToken ct)
     {

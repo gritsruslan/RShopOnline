@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using FluentValidation;
 using Microsoft.Extensions.Logging;
 using RShopAPI_Test.Core.Common;
 using RShopAPI_Test.Core.Enums;
@@ -12,23 +12,29 @@ using EmptyResult = RShopAPI_Test.Core.Common.EmptyResult;
 namespace RShopAPI_Test.Services.Services;
 
 public class AuthService(
-    IUsersRepository repository, 
-    ISaltGenerator saltGenerator, 
+    IUsersRepository repository,
+    ISaltGenerator saltGenerator,
     IPasswordHasher passwordHasher,
     ICurrentUserService currentUserService,
     ILogger<AuthService> logger,
+    
+    //TODO : Fix validators
+    IValidator<RegistrationCommand> registrationValidator,
+    IValidator<LoginCommand> loginValidator,
+    IValidator<ChangePasswordCommand> changePasswordValidator,
+    
     IJwtProvider jwtProvider) : IAuthService
 {
     public async Task<EmptyResult> Registration(RegistrationCommand command, CancellationToken ct)
     {
-        /*var validationResult = await validator.ValidateAsync(command, ct);
+        var validationResult = await registrationValidator.ValidateAsync(command, ct);
         if (!validationResult.IsValid)
         {
             return new Error(validationResult.Errors[0].ErrorMessage);
-        }*/
+        }
         
-        bool doesUserExist = await repository.UserExists(command.Email, ct);
-        if (doesUserExist)
+        bool userExists = await repository.UserExists(command.Email, ct);
+        if (userExists)
         {
             return new Error("User with such an email already exists");
         }
@@ -50,11 +56,11 @@ public class AuthService(
     {
         const string errorMessage = "Invalid username or password";
         
-        /*var validationResult = await validator.ValidateAsync(command, ct);
+        var validationResult = await loginValidator.ValidateAsync(command, ct);
         if (!validationResult.IsValid)
         {
             return new Error(errorMessage);
-        }*/
+        }
         
         var candidate = await repository.GetUserByEmail(command.Email, ct);
         if (candidate is null)
@@ -75,12 +81,12 @@ public class AuthService(
 
     public async Task<EmptyResult> ChangePassword(ChangePasswordCommand command, CancellationToken ct)
     {
-        /*const string invalidPasswordMessage = "Invalid password!";
-        var validationResult = await validator.ValidateAsync(command, ct);
+        const string invalidPasswordMessage = "Invalid password!";
+        var validationResult = await changePasswordValidator.ValidateAsync(command, ct);
         if (!validationResult.IsValid)
         {
             return new Error(invalidPasswordMessage);
-        }*/
+        }
         
         var userId = currentUserService.GetCurrentUserId() 
                      ?? throw new Exception("Unhandled unauthorized user!");

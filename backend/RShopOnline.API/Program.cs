@@ -6,20 +6,7 @@ using Serilog.Filters;
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
 
-
-builder.Services.AddLogging(b => b.AddSerilog(
-    new LoggerConfiguration()
-        .MinimumLevel.Warning()
-        .Enrich.WithProperty("Application", "RShopOnline.API")
-        .Enrich.WithProperty("Environment", builder.Environment.EnvironmentName)
-        .WriteTo.Logger(
-            lc => lc.Filter.ByExcluding(
-                Matching.FromSource("Microsoft")).WriteTo.OpenSearch(
-                configuration.GetConnectionString("Logs"),
-                        "rshop-logs-{0:dd.MM.yyyy}"))
-        .WriteTo.Logger(lc => lc.WriteTo.Console())
-        .CreateLogger()));
-
+builder.Services.AddAppLogging(configuration, builder.Environment.EnvironmentName);
     
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -51,3 +38,5 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.Run();
+
+public partial class Program {}

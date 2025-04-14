@@ -24,7 +24,7 @@ public class ProductController(IProductService service) : ControllerBase
 
     [HttpGet]
     [ProducesResponseType<List<Product>>( 200)]
-    [ProducesResponseType(404)]
+    [ProducesResponseType(400)]
     public async Task<IActionResult> GetProducts(
         [FromServices] IMapper mapper,
         [FromQuery] Guid categoryId,
@@ -45,7 +45,7 @@ public class ProductController(IProductService service) : ControllerBase
     
     [HttpGet("{id::guid}")]
     [ProducesResponseType<Product>(200)]
-    [ProducesResponseType(404)]
+    [ProducesResponseType(400)]
     public async Task<IActionResult> GetProduct(
         [FromRoute] Guid id, 
         CancellationToken ct)
@@ -61,7 +61,7 @@ public class ProductController(IProductService service) : ControllerBase
     [HttpPost]
     [RequireRole(Role.Admin, Role.Manager)]
     [ProducesResponseType<Product>(201)]
-    [ProducesResponseType(404)]
+    [ProducesResponseType(400)]
     public async Task<IActionResult> CreateProduct(
         [FromServices] IMapper mapper,
         [FromBody] CreateProductRequest request, 
@@ -77,8 +77,8 @@ public class ProductController(IProductService service) : ControllerBase
 
     [HttpPut]
     [RequireRole(Role.Admin, Role.Manager)]
-    [ProducesResponseType<Product>(204)]
-    [ProducesResponseType(404)]
+    [ProducesResponseType<Product>(200)]
+    [ProducesResponseType(400)]
     public async Task<IActionResult> UpdateProduct(
         [FromServices] IMapper mapper,
         [FromBody] UpdateProductRequest request, 

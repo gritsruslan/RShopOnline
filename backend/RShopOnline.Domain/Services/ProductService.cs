@@ -12,9 +12,9 @@ public class ProductService(
 {
     public async Task<Result<Product>> CreateProduct(CreateProductCommand command, CancellationToken ct)
     {
-        var doesCategoryExist = await categoriesRepository.CategoryExists(command.CategoryId, ct);
+        var categoryExist = await categoriesRepository.CategoryExists(command.CategoryId, ct);
 
-        if (!doesCategoryExist)
+        if (!categoryExist)
         {
             return new Error("Category doesn't exist");
         }
@@ -31,7 +31,7 @@ public class ProductService(
     public async Task<Result<Product>> GetProduct(Guid id, CancellationToken ct)
     {
         var product = await productsRepository.GetProductById(id, ct);
-        if (product == null)
+        if (product is null)
         {
             return new Error("Product not found");
         }
@@ -43,9 +43,9 @@ public class ProductService(
 
     public async Task<Result<IEnumerable<Product>>> GetProducts(GetProductsCommand command, CancellationToken ct)
     {
-        bool doesCategoryExist = await categoriesRepository.CategoryExists(command.CategoryId, ct);
+        bool categoryExists = await categoriesRepository.CategoryExists(command.CategoryId, ct);
 
-        if (!doesCategoryExist)
+        if (!categoryExists)
         {
             return new Error("Category doesn't exist");
         }
@@ -77,14 +77,14 @@ public class ProductService(
 
     public async Task<Result<Product>> UpdateProduct(UpdateProductCommand command, CancellationToken ct)
     {
-        var doesProductExist = await productsRepository.ProductExists(command.Id, ct);
-        if (!doesProductExist)
+        var productExists = await productsRepository.ProductExists(command.Id, ct);
+        if (!productExists)
         {
             return new Error("Product does not exist");
         }
         
-        var doesNewCategoryExist = await categoriesRepository.CategoryExists(command.CategoryId, ct);
-        if (!doesNewCategoryExist)
+        var categoryExists = await categoriesRepository.CategoryExists(command.CategoryId, ct);
+        if (!categoryExists)
         {
             return new Error("Category does not exist");
         }
