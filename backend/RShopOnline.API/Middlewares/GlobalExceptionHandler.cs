@@ -10,7 +10,8 @@ public class GlobalExceptionHandler(RequestDelegate next, ILogger<GlobalExceptio
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, ex.Message);
+            logger.LogError(ex,"Error has happened with {RequestPath}, the message is {ErrorMessage}!", 
+                httpContext.Request.Path, ex.Message);
             httpContext.Response.StatusCode = 500;
             await httpContext.Response.WriteAsync($"Unhandled error occured! {ex}");
         }
