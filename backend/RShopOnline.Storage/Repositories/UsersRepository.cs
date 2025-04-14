@@ -22,6 +22,14 @@ public class UsersRepository(RShopDbContext dbContext, IMapper mapper) : IUsersR
         
         await dbContext.SaveChangesAsync(ct);
     }
+
+    public async Task UpdatePassword(byte[] newPasswordHash, CancellationToken ct)
+    {
+        await dbContext.Users
+            .ExecuteUpdateAsync(u => 
+                u.SetProperty(u => u.PasswordHash, newPasswordHash), ct);
+        await dbContext.SaveChangesAsync(ct);
+    }
     
     public async Task<User?> GetUserByEmail(string email, CancellationToken ct)
     {

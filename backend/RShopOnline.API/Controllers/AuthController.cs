@@ -9,14 +9,13 @@ namespace RShopAPI_Test.Controllers;
 
 [ApiController]
 [Route("/api/auth")]
-public class AuthController(IAuthService service) : ControllerBase 
+public class AuthController(IAuthService service, IMapper mapper) : ControllerBase 
 {
     [HttpPost("login")]
     [ProducesResponseType(200)]
     [ProducesResponseType(400)]
     public async Task<IActionResult> Login(
         [FromBody] LoginRequest request,
-        IMapper mapper,
         CancellationToken ct)
     {
         var result = await service.Login(mapper.Map<LoginCommand>(request), ct);
@@ -36,7 +35,6 @@ public class AuthController(IAuthService service) : ControllerBase
     [ProducesResponseType(200)]
     [ProducesResponseType(400)]
     public async Task<IActionResult> Register(
-        [FromServices] IMapper mapper,
         [FromBody] RegistrationRequest request, 
         CancellationToken ct)
     {
@@ -53,8 +51,17 @@ public class AuthController(IAuthService service) : ControllerBase
 
     [HttpPost("changepassword")]
     [Authorize]
-    public Task<IActionResult> ChangePassword()
+    [ProducesResponseType(200)]
+    [ProducesResponseType(400)]
+    public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest request, CancellationToken ct)
     {
-        throw new NotImplementedException();
+        var result = await service.ChangePassword(mapper.Map<ChangePasswordCommand>(request), ct);
+
+        if (result.IsFailure)
+        {
+            return BadRequest(result.Error);
+        }
+
+        return Ok();
     }
 }

@@ -8,4 +8,6 @@ public interface IAuthService
     Task<EmptyResult> Registration(RegistrationCommand command, CancellationToken ct);
     
     Task<Result<string>> Login(LoginCommand command, CancellationToken ct);
+    
+    Task<EmptyResult> ChangePassword(ChangePasswordCommand command, CancellationToken ct);
 }

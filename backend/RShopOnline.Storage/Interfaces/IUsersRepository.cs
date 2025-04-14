@@ -18,4 +18,6 @@ public interface IUsersRepository
     public Task<User?> GetUserById(Guid id, CancellationToken ct);
     
     public Task<bool> UserExists(string email, CancellationToken ct);
+    
+    public Task UpdatePassword(byte[] newPasswordHash, CancellationToken ct);
 }
