@@ -16,6 +16,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "solution-items", "solution-
 		docker-compose.yml = docker-compose.yml
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{ECAB8340-1F11-4CB4-AA9E-1E9DBBC984E9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RShopOnline.Tests", "tests\RShopOnline.Tests\RShopOnline.Tests.csproj", "{6F5EC851-A539-428D-A96D-99EC51A59885}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -38,5 +42,12 @@ Global
 		{262BC5B4-7567-43F9-AC9E-7C6991C148D6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{262BC5B4-7567-43F9-AC9E-7C6991C148D6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{262BC5B4-7567-43F9-AC9E-7C6991C148D6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6F5EC851-A539-428D-A96D-99EC51A59885}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6F5EC851-A539-428D-A96D-99EC51A59885}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6F5EC851-A539-428D-A96D-99EC51A59885}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6F5EC851-A539-428D-A96D-99EC51A59885}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{6F5EC851-A539-428D-A96D-99EC51A59885} = {ECAB8340-1F11-4CB4-AA9E-1E9DBBC984E9}
 	EndGlobalSection
 EndGlobal
