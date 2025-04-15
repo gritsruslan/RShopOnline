@@ -1,5 +1,6 @@
 ﻿using System.Linq.Expressions;
 using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
 using RShopAPI_Test.Core.Models;
 using RShopAPI_Test.Storage.Entities;
@@ -11,14 +12,14 @@ public class ProductsRepository(RShopDbContext dbContext, IMapper mapper) : IPro
 {
     public async Task<IEnumerable<Product>> GetAllProducts(CancellationToken ct)
     {
-        return await dbContext.Products.AsNoTracking().Select(p => mapper.Map<Product>(p)).ToListAsync(ct);
+        return await dbContext.Products.AsNoTracking().ProjectTo<Product>(mapper.ConfigurationProvider).ToListAsync(ct);
     }
 
     public async Task<IEnumerable<Product>> GetProductsByIds(IReadOnlyCollection<Guid> ids, CancellationToken ct)
     {
         return await dbContext.Products.AsNoTracking()
             .Where(p => ids.Contains(p.Id))
-            .Select(p => mapper.Map<Product>(p))
+            .ProjectTo<Product>(mapper.ConfigurationProvider)
             .ToListAsync(ct);
     }
 
@@ -47,7 +48,7 @@ public class ProductsRepository(RShopDbContext dbContext, IMapper mapper) : IPro
         else
             query = query.OrderByDescending(orderByExpression);
 
-        return await query.Select(p => mapper.Map<Product>(p)).ToListAsync(ct);
+        return await query.ProjectTo<Product>(mapper.ConfigurationProvider).ToListAsync(ct);
     }
     
     public async Task<Product> CreateProduct(
@@ -79,7 +80,7 @@ public class ProductsRepository(RShopDbContext dbContext, IMapper mapper) : IPro
         
         return await dbContext.Products
             .Where(p => p.Id == id)
-            .Select(p => mapper.Map<Product>(p))
+            .ProjectTo<Product>(mapper.ConfigurationProvider)
             .FirstAsync(ct);
     }
 

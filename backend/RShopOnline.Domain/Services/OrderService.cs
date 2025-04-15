@@ -25,7 +25,7 @@ public class OrderService(
     public async Task<IEnumerable<Order>> GetOrdersByCurrentUser(CancellationToken ct)
     {
         var userId = currentUserService.GetCurrentUserId() ??
-                     throw new Exception("Unhandled unauthorized user exception!");
+                     throw new UnauthorizedAccessException("Unhandled unauthorized user exception!");
 
         return await ordersRepository.GetOrdersByUserId(userId, ct);
     }
@@ -33,10 +33,15 @@ public class OrderService(
     public async Task<Result<Order>> CreateOrder(CreateOrderCommand command, CancellationToken ct)
     {
         var userId = currentUserService.GetCurrentUserId() ??
-                     throw new Exception("Unhandled unauthorized user exception!");
+                     throw new UnauthorizedAccessException("Unhandled unauthorized user exception!");
 
         var orderId = Guid.NewGuid();
         var processedOrderItems = new List<OrderItem>(command.OrderItems.Count);
+
+        if (command.OrderItems.Count == 0)
+        {
+            return new Error("Order is empty!");
+        }
         
         foreach (var orderItemDto in command.OrderItems)
         {
@@ -78,7 +83,7 @@ public class OrderService(
     public async Task<EmptyResult> CancelOrder(Guid orderId, CancellationToken ct)
     {
         var userId = currentUserService.GetCurrentUserId() ??
-                     throw new Exception("Unhandled unauthorized user exception!");
+                     throw new UnauthorizedAccessException("Unhandled unauthorized user exception!");
         
         var order = await ordersRepository.GetOrderById(orderId, ct);
 

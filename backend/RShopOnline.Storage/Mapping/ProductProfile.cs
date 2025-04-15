@@ -8,6 +8,9 @@ public class ProductProfile : Profile
 {
     public ProductProfile()
     {
-        CreateMap<Product, ProductEntity>().ReverseMap();
+        CreateMap<ProductEntity, Product>()
+            .ForSourceMember(src => src.CategoryId, opt => opt.DoNotValidate())
+            .ForSourceMember(src => src.Category, opt => opt.DoNotValidate())
+            .ForSourceMember(src => src.OrderItems, opt => opt.DoNotValidate());
     }
 }

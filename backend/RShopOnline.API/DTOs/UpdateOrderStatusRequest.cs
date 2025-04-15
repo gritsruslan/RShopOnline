@@ -2,4 +2,4 @@
 
 namespace RShopAPI_Test.DTOs;
 
-public record UpdateOrderStatusRequest(Guid OrderId, OrderStatus OrderStatus);
+public record UpdateOrderStatusRequest(Guid OrderId, OrderStatus NewOrderStatus);

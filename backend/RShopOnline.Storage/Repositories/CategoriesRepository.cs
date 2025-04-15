@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
 using RShopAPI_Test.Core.Models;
 using RShopAPI_Test.Storage.Entities;
@@ -19,7 +20,7 @@ public class CategoriesRepository(RShopDbContext dbContext, IMapper mapper) : IC
     {
         return await dbContext.Categories
             .AsNoTracking()
-            .Select(c => mapper.Map<Category>(c))
+            .ProjectTo<Category>(mapper.ConfigurationProvider)
             .ToListAsync(ct);
     }
 

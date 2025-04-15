@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
 using RShopAPI_Test.Core.Enums;
 using RShopAPI_Test.Core.Models;
@@ -35,7 +36,7 @@ public class UsersRepository(RShopDbContext dbContext, IMapper mapper) : IUsersR
     {
         return await dbContext.Users
             .Where(u => u.Email == email)
-            .Select(u => mapper.Map<User>(u))
+            .ProjectTo<User>(mapper.ConfigurationProvider)
             .FirstOrDefaultAsync(ct);
     }
 
@@ -43,7 +44,7 @@ public class UsersRepository(RShopDbContext dbContext, IMapper mapper) : IUsersR
     {
         return await dbContext.Users.AsNoTracking()
             .Where(u => u.Id == id)
-            .Select(u => mapper.Map<User>(u))
+            .ProjectTo<User>(mapper.ConfigurationProvider)
             .FirstOrDefaultAsync(ct);
     }
 

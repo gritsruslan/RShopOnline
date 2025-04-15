@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
 using RShopAPI_Test.Core.Enums;
 using RShopAPI_Test.Core.Models;
@@ -11,13 +12,8 @@ public class OrdersRepository(RShopDbContext dbContext, IMapper mapper) : IOrder
 {
     public async Task<Order> CreateOrder(Guid orderId, Guid userId, IEnumerable<OrderItem> orderItems, CancellationToken ct)
     {
-        var orderItemEntities = orderItems.Select(o => new OrderItemEntity()
-        {
-            OrderId = orderId,
-            ProductId = o.ProductId,
-            Quantity = o.Quantity,
-            PriceAtOrderTime = o.PriceAtOrderTime
-        }).ToList();
+        var orderItemEntities = orderItems
+            .Select(mapper.Map<OrderItemEntity>).ToList();
         
         var orderEntity = new OrderEntity()
         {
@@ -39,7 +35,7 @@ public class OrdersRepository(RShopDbContext dbContext, IMapper mapper) : IOrder
             .AsNoTracking()
             .Where(o => o.Id == id)
             .Include(o => o.OrderItems)
-            .Select(o => mapper.Map<Order>(o))
+            .ProjectTo<Order>(mapper.ConfigurationProvider)
             .FirstOrDefaultAsync(ct);
     }
 
@@ -48,7 +44,7 @@ public class OrdersRepository(RShopDbContext dbContext, IMapper mapper) : IOrder
          var orders = await dbContext.Orders.AsNoTracking()
             .Where(o => o.UserId == userId)
             .Include(o => o.OrderItems)
-            .Select(o => mapper.Map<Order>(o))
+            .ProjectTo<Order>(mapper.ConfigurationProvider)
             .ToListAsync(ct);
          return orders;
     }

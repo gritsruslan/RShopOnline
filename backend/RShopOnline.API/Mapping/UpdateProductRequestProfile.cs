@@ -9,6 +9,6 @@ public class UpdateProductRequestProfile : Profile
 {
     public UpdateProductRequestProfile()
     {
-        CreateMap<UpdateProductRequest, UpdateProductCommand>().ReverseMap();
+        CreateMap<UpdateProductRequest, UpdateProductCommand>();
     }
 }

@@ -10,26 +10,26 @@ namespace RShopOnline.Tests.Services;
 
 public class ProductServiceShould
 {
-    private ProductService sut;
-    private Mock<IProductsRepository> productsRepository;
-    private Mock<ICategoriesRepository> categoriesRepository;
-    private ISetup<IProductsRepository, Task<Product>> createProductSetup;
-    private ISetup<IProductsRepository, Task<Product>> updateProductSetup;
-    private ISetup<ICategoriesRepository, Task<bool>> categoryExistsSetup;
-    private ISetup<IProductsRepository, Task<bool>> productExistsSetup;
-    private ISetup<IProductsRepository, Task<IEnumerable<Product>>> getProductsSetup;
+    private readonly ProductService Sut;
+    private readonly Mock<IProductsRepository> ProductsRepository;
+    private readonly Mock<ICategoriesRepository> CategoriesRepository;
+    private readonly ISetup<IProductsRepository, Task<Product>> CreateProductSetup;
+    private readonly ISetup<IProductsRepository, Task<Product>> UpdateProductSetup;
+    private readonly ISetup<ICategoriesRepository, Task<bool>> CategoryExistsSetup;
+    private readonly ISetup<IProductsRepository, Task<bool>> ProductExistsSetup;
+    private readonly ISetup<IProductsRepository, Task<IEnumerable<Product>>> GetProductsSetup;
     
     public ProductServiceShould()
     {
-        categoriesRepository = new Mock<ICategoriesRepository>();
-        categoryExistsSetup = categoriesRepository.Setup(
+        CategoriesRepository = new Mock<ICategoriesRepository>();
+        CategoryExistsSetup = CategoriesRepository.Setup(
             c => c.CategoryExists(It.IsAny<Guid>(), It.IsAny<CancellationToken>()));
         
-        productsRepository = new Mock<IProductsRepository>();
-        productExistsSetup = productsRepository
+        ProductsRepository = new Mock<IProductsRepository>();
+        ProductExistsSetup = ProductsRepository
             .Setup(p => p.ProductExists(It.IsAny<Guid>(), It.IsAny<CancellationToken>()));
         
-        createProductSetup = productsRepository.Setup(p =>
+        CreateProductSetup = ProductsRepository.Setup(p =>
             p.CreateProduct(It.IsAny<string>(), 
                 It.IsAny<decimal>(), 
                 It.IsAny<Guid>(), 
@@ -37,17 +37,17 @@ public class ProductServiceShould
                 It.IsAny<string>(),
                 It.IsAny<CancellationToken>()));
         
-        updateProductSetup = productsRepository.Setup(p => 
+        UpdateProductSetup = ProductsRepository.Setup(p => 
             p.UpdateProduct(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<decimal>(), It.IsAny<bool>(), It.IsAny<string>(), It.IsAny<CancellationToken>()));
         
-        getProductsSetup = productsRepository.Setup(
+        GetProductsSetup = ProductsRepository.Setup(
             p => p.GetProducts(It.IsAny<Guid>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<CancellationToken>()));
         
-        sut = new ProductService(productsRepository.Object, categoriesRepository.Object);
+        Sut = new ProductService(ProductsRepository.Object, CategoriesRepository.Object);
     }
 
     [Fact]
-    public async Task ShouldCreateProduct_WhenCategoryExists()
+    public async Task CreateProduct_WhenCategoryExists()
     {
         Guid guid = Guid.Parse("9B4522C0-36F2-4387-BF29-230DF010EE78");
         string name = "name";
@@ -64,55 +64,55 @@ public class ProductServiceShould
             Description = description
         };
         
-        categoryExistsSetup.ReturnsAsync(true);
-        createProductSetup.ReturnsAsync(expected);
+        CategoryExistsSetup.ReturnsAsync(true);
+        CreateProductSetup.ReturnsAsync(expected);
         
         var command = new CreateProductCommand(name, price, categoryId, inStock, description);
-        var result = await sut.CreateProduct(command, CancellationToken.None);
+        var result = await Sut.CreateProduct(command, CancellationToken.None);
         
         result.IsSuccess.Should().BeTrue();
         result.Value.Should().Be(expected);
     }
 
     [Fact]
-    public async Task ShouldNotCreateProduct_WhenCategoryDoesNotExist()
+    public async Task DontCreateProduct_WhenCategoryDoesNotExist()
     {
-        categoryExistsSetup.ReturnsAsync(false);
+        CategoryExistsSetup.ReturnsAsync(false);
         var command = new CreateProductCommand("name", 100, Guid.Parse("82960DFD-44ED-4B7B-9B00-15C556E80824"), true, "description");
-        var result = await sut.CreateProduct(command, CancellationToken.None);
+        var result = await Sut.CreateProduct(command, CancellationToken.None);
         result.IsSuccess.Should().BeFalse();
     }
 
     [Fact]
-    public async Task ShouldNotUpdateProduct_WhenCategoryDoesNotExist()
+    public async Task DontUpdateProduct_WhenCategoryDoesNotExist()
     {
-        productExistsSetup.ReturnsAsync(true);
-        categoryExistsSetup.ReturnsAsync(false);
+        ProductExistsSetup.ReturnsAsync(true);
+        CategoryExistsSetup.ReturnsAsync(false);
         
         var id = Guid.Parse("A7F5C976-90B5-4F78-84EF-4B3DA84F81C4");
         var categoryId = Guid.Parse("563F18DC-6B6E-4E44-8EC4-84311CE2DB5A");
         var command = new UpdateProductCommand(id, "name", 100, categoryId, true, "description");
-        var result = await sut.UpdateProduct(command, CancellationToken.None);
+        var result = await Sut.UpdateProduct(command, CancellationToken.None);
         
         result.IsSuccess.Should().BeFalse();
     }
     
     [Fact]
-    public async Task ShouldNotUpdateProduct_WhenProductDoesNotExist()
+    public async Task DontUpdateProduct_WhenProductDoesNotExist()
     {
-        productExistsSetup.ReturnsAsync(false);
-        categoryExistsSetup.ReturnsAsync(true);
+        ProductExistsSetup.ReturnsAsync(false);
+        CategoryExistsSetup.ReturnsAsync(true);
 
         var id = Guid.Parse("A7F5C976-90B5-4F78-84EF-4B3DA84F81C4");
         var categoryId = Guid.Parse("563F18DC-6B6E-4E44-8EC4-84311CE2DB5A");
         var command = new UpdateProductCommand(id, "name", 100, categoryId, true, "description");
-        var result = await sut.UpdateProduct(command, CancellationToken.None);
+        var result = await Sut.UpdateProduct(command, CancellationToken.None);
         
         result.IsSuccess.Should().BeFalse();
     }
 
     [Fact]
-    public async Task ShouldCorrectUpdateProduct_WhenProductAndCategoryExists()
+    public async Task CorrectUpdateProduct_WhenProductAndCategoryExists()
     {
         Guid id = Guid.Parse("A9AF5CAD-3163-4FF4-8072-64EABB807CE2");
         Guid categoryId = Guid.Parse("89519283-256B-4EFB-84A2-5403FF620397");
@@ -129,81 +129,81 @@ public class ProductServiceShould
             Description = description
         };
         
-        productExistsSetup.ReturnsAsync(true);
-        categoryExistsSetup.ReturnsAsync(true);
-        updateProductSetup.ReturnsAsync(expected);
+        ProductExistsSetup.ReturnsAsync(true);
+        CategoryExistsSetup.ReturnsAsync(true);
+        UpdateProductSetup.ReturnsAsync(expected);
         
         var command  = new UpdateProductCommand(id, name, price, categoryId, inStock, description);
-        var result = await sut.UpdateProduct(command, CancellationToken.None);
+        var result = await Sut.UpdateProduct(command, CancellationToken.None);
         
         result.IsSuccess.Should().BeTrue();
         result.Value.Should().Be(expected);
     }
 
     [Fact]
-    public async Task ShouldNotGetProductsWithPagination_WhenCategoryDoesNotExist()
+    public async Task DontGetProductsWithPagination_WhenCategoryDoesNotExist()
     {
-        categoryExistsSetup.ReturnsAsync(false);
+        CategoryExistsSetup.ReturnsAsync(false);
 
         var categoryId = Guid.Parse("6A1C1C2C-30E3-48EE-802C-27C3D83C1250");
         var command = new GetProductsCommand(categoryId, 5, 10, "Price", true);
 
-        var result = await sut.GetProducts(command, CancellationToken.None);
+        var result = await Sut.GetProducts(command, CancellationToken.None);
         
         result.IsSuccess.Should().BeFalse();
     }
 
     [Fact]
-    public async Task ShouldNotGetProductsWithPagination_WhenIncorrectOrderField()
+    public async Task DontGetProductsWithPagination_WhenIncorrectOrderField()
     {
-        categoryExistsSetup.ReturnsAsync(true);
+        CategoryExistsSetup.ReturnsAsync(true);
         
         var categoryId = Guid.Parse("6A1C1C2C-30E3-48EE-802C-27C3D83C1250");
         var command = new GetProductsCommand(categoryId, 5, 10, "Price222", true);
 
-        var result = await sut.GetProducts(command, CancellationToken.None);
+        var result = await Sut.GetProducts(command, CancellationToken.None);
         
         result.IsSuccess.Should().BeFalse();
     }
 
     [Fact]
-    public async Task ShouldNotGetProductsWithPagination_WhenPageIsIncorrect()
+    public async Task DontGetProductsWithPagination_WhenPageIsIncorrect()
     {
-        categoryExistsSetup.ReturnsAsync(true);
+        CategoryExistsSetup.ReturnsAsync(true);
         
         var categoryId = Guid.Parse("6A1C1C2C-30E3-48EE-802C-27C3D83C1250");
         var command = new GetProductsCommand(categoryId, -1488, 10, "Price", true);
 
-        var result = await sut.GetProducts(command, CancellationToken.None);
+        var result = await Sut.GetProducts(command, CancellationToken.None);
         
         result.IsSuccess.Should().BeFalse();
     }
     
     [Fact]
-    public async Task ShouldNotGetProductsWithPagination_WhenPageSizeIsIncorrect()
+    public async Task DontGetProductsWithPagination_WhenPageSizeIsIncorrect()
     {
-        categoryExistsSetup.ReturnsAsync(true);
+        CategoryExistsSetup.ReturnsAsync(true);
         
         var categoryId = Guid.Parse("6A1C1C2C-30E3-48EE-802C-27C3D83C1250");
         var command = new GetProductsCommand(categoryId, 5, -1488, "Price", true);
 
-        var result = await sut.GetProducts(command, CancellationToken.None);
+        var result = await Sut.GetProducts(command, CancellationToken.None);
         
         result.IsSuccess.Should().BeFalse();
     }
 
     [Fact]
-    public async Task ShouldCorrectReturnProductsWithPagination()
+    public async Task CorrectReturnProductsWithPagination()
     {
         Product[] expected = [];
         
-        categoryExistsSetup.ReturnsAsync(true);
-        getProductsSetup.ReturnsAsync(expected);
+        CategoryExistsSetup.ReturnsAsync(true);
+        GetProductsSetup.ReturnsAsync(expected);
         
         var categoryId = Guid.Parse("6A1C1C2C-30E3-48EE-802C-27C3D83C1250");
         var command = new GetProductsCommand(categoryId, 5, 10, "Price", true);
 
-        var result = await sut.GetProducts(command, CancellationToken.None);
+        var result = await Sut.GetProducts(command, CancellationToken.None);
         
         result.IsSuccess.Should().BeTrue();
         result.Value.Should().BeEquivalentTo(expected);

@@ -8,6 +8,6 @@ public class UpdateOrderStatusRequestProfile : Profile
 {
     public UpdateOrderStatusRequestProfile()
     {
-        CreateMap<UpdateOrderStatusCommand, UpdateOrderStatusRequest>().ReverseMap();
+        CreateMap<UpdateOrderStatusRequest, UpdateOrderStatusCommand>();
     }
 }

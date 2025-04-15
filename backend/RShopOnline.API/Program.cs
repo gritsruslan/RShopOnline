@@ -1,3 +1,4 @@
+using AutoMapper;
 using RShopAPI_Test.Extensions;
 using RShopAPI_Test.Middlewares;
 using Serilog;
@@ -29,6 +30,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.Services.GetRequiredService<IMapper>().ConfigurationProvider.AssertConfigurationIsValid();
 
 app.UseMiddleware<GlobalExceptionHandler>();
 app.UseHttpsRedirection();

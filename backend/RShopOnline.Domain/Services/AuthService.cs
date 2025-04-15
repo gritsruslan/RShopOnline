@@ -16,7 +16,6 @@ public class AuthService(
     ISaltGenerator saltGenerator,
     IPasswordHasher passwordHasher,
     ICurrentUserService currentUserService,
-    ILogger<AuthService> logger,
     
     //TODO : Fix validators
     IValidator<RegistrationCommand> registrationValidator,
@@ -89,7 +88,7 @@ public class AuthService(
         }
         
         var userId = currentUserService.GetCurrentUserId() 
-                     ?? throw new Exception("Unhandled unauthorized user!");
+                     ?? throw new UnauthorizedAccessException("Unhandled unauthorized user!");
         
         var candidate = await repository.GetUserById(userId, ct);
         if (candidate is null)
