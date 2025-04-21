@@ -2,5 +2,5 @@
 
 public static class JwtClaims
 {
-    internal const string UserId = "userId";
+    public const string UserId = "userId";
 }

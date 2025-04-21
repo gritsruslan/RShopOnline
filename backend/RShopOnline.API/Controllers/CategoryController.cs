@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using RShopAPI_Test.Core.Enums;
 using RShopAPI_Test.Core.Models;
 using RShopAPI_Test.DTOs;
-using RShopAPI_Test.Services.Auth;
+using RShopAPI_Test.Services.Commands;
 using RShopAPI_Test.Services.Interfaces;
 
 namespace RShopAPI_Test.Controllers;
@@ -13,13 +13,16 @@ namespace RShopAPI_Test.Controllers;
 public class CategoryController(ICategoryService service) : ControllerBase
 {
     [HttpPost]
-    [RequireRole(Role.Admin, Role.Manager)]
     [ProducesResponseType<Category>(201)]
     public async Task<IActionResult> CreateCategory(
         CreateCategoryRequest request, 
         CancellationToken ct)
     {
-        await service.CreateCategory(request.Name, ct);
+        var result = await service.CreateCategory(new CreateCategoryCommand(request.Name), ct);
+        if (result.IsFailure)
+        {
+            return BadRequest(result.Error);
+        }
         return Ok();
     }
 

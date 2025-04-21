@@ -1,5 +1,6 @@
 ﻿using RShopAPI_Test.Core.Common;
 using RShopAPI_Test.Core.Models;
+using RShopAPI_Test.Services.Authorization;
 using RShopAPI_Test.Services.Commands;
 using RShopAPI_Test.Services.Interfaces;
 using RShopAPI_Test.Storage.Interfaces;
@@ -8,15 +9,20 @@ namespace RShopAPI_Test.Services.Services;
 
 public class ProductService(
     IProductsRepository productsRepository,
-    ICategoriesRepository categoriesRepository) : IProductService
+    ICategoriesRepository categoriesRepository,
+    IIntentionManager intentionManager) : IProductService
 {
     public async Task<Result<Product>> CreateProduct(CreateProductCommand command, CancellationToken ct)
     {
+        if (!intentionManager.IsAllowed<CreateOrderCommand>())
+        {
+            return new Error(ErrorCode.Forbidden);
+        }
+        
         var categoryExist = await categoriesRepository.CategoryExists(command.CategoryId, ct);
-
         if (!categoryExist)
         {
-            return new Error("Category doesn't exist");
+            return new Error("Category doesn't exist", ErrorCode.NotFound);
         }
         
         return await productsRepository.CreateProduct(command.Name, command.Price, command.CategoryId, command.InStock,
@@ -70,13 +76,16 @@ public class ProductService(
         
         var products = await productsRepository
             .GetProducts(command.CategoryId, skip, take, command.OrderByField, command.Ascending, ct);
-        
-        // idk why implicit operator is not working here
         return Result<IEnumerable<Product>>.Success(products);
     }
 
     public async Task<Result<Product>> UpdateProduct(UpdateProductCommand command, CancellationToken ct)
     {
+        if (!intentionManager.IsAllowed<UpdateProductCommand>())
+        {
+            return new Error(ErrorCode.Forbidden);
+        }
+        
         var productExists = await productsRepository.ProductExists(command.Id, ct);
         if (!productExists)
         {

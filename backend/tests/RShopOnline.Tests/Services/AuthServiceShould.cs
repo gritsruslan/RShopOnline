@@ -4,7 +4,10 @@ using FluentValidation;
 using FluentValidation.Results;
 using Moq;
 using Moq.Language.Flow;
+using RShopAPI_Test.Core.Enums;
 using RShopAPI_Test.Core.Models;
+using RShopAPI_Test.Services.Authentication;
+using RShopAPI_Test.Services.Authorization;
 using RShopAPI_Test.Services.Commands;
 using RShopAPI_Test.Services.Interfaces;
 using RShopAPI_Test.Services.Jwt;
@@ -18,7 +21,6 @@ public class AuthServiceShould
 {
     private readonly AuthService Sut;
     private readonly ISetup<IUsersRepository, Task<bool>> UserExistsByEmailSetup;
-    private readonly ISetup<ICurrentUserService, Guid?> GetCurrentUserSetup;
     private readonly ISetup<IUsersRepository, Task<User?>> GetUserByIdSetup;
     private readonly ISetup<IUsersRepository, Task<User?>> GetUserByEmailSetup;
     
@@ -29,8 +31,13 @@ public class AuthServiceShould
     {
         var usersRepository = new Mock<IUsersRepository>();
         var jwtProvider = new Mock<IJwtProvider>();
-        var currentUserService = new Mock<ICurrentUserService>();
+        var identityProvider = new Mock<IIdentityProvider>();
+        identityProvider.Setup(r => r.Current).Returns(
+            new UserIdentity(Guid.Parse("960D90CB-014A-474D-A250-4520A795D091"), Role.Customer));
         
+        var intentionManager = new Mock<IIntentionManager>();
+        intentionManager.Setup(m => m.IsAllowed<ChangePasswordCommand>()).Returns(true);
+            
         var registrationValidator = new Mock<IValidator<RegistrationCommand>>();
         var loginValidator = new Mock<IValidator<LoginCommand>>();
         var changePasswordValidator = new Mock<IValidator<ChangePasswordCommand>>();
@@ -49,7 +56,8 @@ public class AuthServiceShould
             usersRepository.Object, 
             SaltGenerator,
             PasswordHasher, 
-            currentUserService.Object, 
+            identityProvider.Object,
+            intentionManager.Object,
             registrationValidator.Object, 
             loginValidator.Object, 
             changePasswordValidator.Object, 
@@ -63,8 +71,6 @@ public class AuthServiceShould
         
         GetUserByEmailSetup = 
             usersRepository.Setup(r => r.GetUserByEmail(It.IsAny<string>(), It.IsAny<CancellationToken>()));
-        
-        GetCurrentUserSetup = currentUserService.Setup(r => r.GetCurrentUserId());
     }
     
 
@@ -141,22 +147,10 @@ public class AuthServiceShould
         result.IsSuccess.Should().BeTrue();
         result.Value.Should().NotBeEmpty();
     }
-
-
-    [Fact]
-    public async Task ThrowUnauthorizedExceptionWhileChangingPassword_WhenUserIsNotAuthenticated()
-    {
-        GetCurrentUserSetup.Returns((Guid?)null);
-        
-        await Sut.Invoking(s =>
-                s.ChangePassword(new ChangePasswordCommand("password", "newPassword"), CancellationToken.None))
-            .Should().ThrowAsync<UnauthorizedAccessException>();
-    }
-
+    
     [Fact]
     public async Task DontChangePassword_WhenUserDoesNotExists()
     {
-        GetCurrentUserSetup.Returns(Guid.Parse("CD2F60CE-044B-4846-A2E1-059C4A0367FF"));
         GetUserByIdSetup.ReturnsAsync((User?)null);
 
         var result = await Sut.ChangePassword(
@@ -169,8 +163,6 @@ public class AuthServiceShould
     [Fact]
     public async Task DontChangePassword_WhenPasswordIsInvalid()
     {
-        GetCurrentUserSetup.Returns(Guid.Parse("CD2F60CE-044B-4846-A2E1-059C4A0367FF"));
-        
         var password = "MyPassword";
         var newPassword = "newPassword";
         var invalidPassword = "invalidPassword";
@@ -195,8 +187,6 @@ public class AuthServiceShould
     [Fact]
     public async Task SuccessfullyChangePassword()
     {
-        GetCurrentUserSetup.Returns(Guid.Parse("78906B5F-3BE3-4C2D-B1D7-C0E4525BC91B"));
-        
         var password = "password";
         var newPassword = "newPassword";
         

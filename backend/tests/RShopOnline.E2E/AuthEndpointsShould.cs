@@ -1,14 +1,17 @@
 ﻿using System.Net.Http.Json;
 using FluentAssertions;
 using RShopAPI_Test.DTOs;
+using RShopAPI_Test.Services.Commands;
 using Xunit.Abstractions;
 
 namespace RShopOnline.E2E;
 
 public class AuthEndpointsShould(RShopApiApplicationFactory factory, ITestOutputHelper testOutputHelper) : IClassFixture<RShopApiApplicationFactory>
 {
+    public const string Uri = "http://localhost";
+    
     [Fact]
-    public async Task RegisterUser()
+    public async Task SuccessfullyregisterUser()
     {
         using var client = factory.CreateClient();
         using var response = await client.PostAsync("/api/auth/register",
@@ -30,12 +33,11 @@ public class AuthEndpointsShould(RShopApiApplicationFactory factory, ITestOutput
         
         using var response2 = await client.PostAsync("/api/auth/register",
             JsonContent.Create(new RegistrationRequest("Name", email ,"StrongPass123")));
-        testOutputHelper.WriteLine(response2.StatusCode.ToString());
         response2.Invoking(r => r.EnsureSuccessStatusCode()).Should().Throw<HttpRequestException>();
     }
 
     [Fact]
-    public async Task LoginUser()
+    public async Task SuccessfullyLoginUser()
     {
         using var client = factory.CreateClient();
         var email = "laskdjflaksdf123123@pornhub.com";
@@ -79,5 +81,63 @@ public class AuthEndpointsShould(RShopApiApplicationFactory factory, ITestOutput
             JsonContent.Create(new LoginRequest(email, incorrectPassword)));
         loginResponse.Invoking(r => r.EnsureSuccessStatusCode()).Should().Throw<HttpRequestException>();
 
+    }
+
+    [Fact]
+    public async Task DontChangePassword_WhenUserIsNotAuthenticated()
+    {
+        using var client = factory.CreateClient();
+        using var response = await client.PostAsync("/api/auth/changepassword", JsonContent.Create(
+                new ChangePasswordCommand("Passsssss123", "Passsssss1234")));
+        response.IsSuccessStatusCode.Should().BeFalse();
+    }
+
+    [Fact]
+    public async Task DontChangePassword_WhenPasswordIsIncorrect()
+    {
+        using var client = factory.CreateClient();
+        
+        var email = "myemail123@gmaaaail.com";
+        var password = "myPass777888";
+        var incorrectPassword = "myPass777888!";
+        var newPassword = "1myPass777888";
+        
+        using var registerResponse = await client.PostAsync("/api/auth/register", 
+            JsonContent.Create(new RegistrationRequest("Name", email, password)));
+        registerResponse.IsSuccessStatusCode.Should().BeTrue();
+        
+        using var loginResponse =
+            await client.PostAsync("/api/auth/login", JsonContent.Create(new LoginRequest(email, password)));
+        loginResponse.IsSuccessStatusCode.Should().BeTrue();
+        
+        var changePasswordRequest = new HttpRequestMessage(HttpMethod.Post, "/api/auth/changepassword");
+        changePasswordRequest.Content = JsonContent.Create(new ChangePasswordRequest(incorrectPassword, newPassword));
+
+        using var changePassResponse = await client.SendAsync(changePasswordRequest);
+        changePassResponse.IsSuccessStatusCode.Should().BeFalse();
+    }
+
+    [Fact]
+    public async Task SuccessfullyChangePassword()
+    {
+        using var client = factory.CreateClient();
+        
+        var email = "myemail123z@gmaaaail.com";
+        var password = "myPass777888";
+        var newPassword = "1myPass777888";
+        
+        using var registerResponse = await client.PostAsync("/api/auth/register", 
+            JsonContent.Create(new RegistrationRequest("Name", email, password)));
+        registerResponse.IsSuccessStatusCode.Should().BeTrue();
+        
+        using var loginResponse =
+            await client.PostAsync("/api/auth/login", JsonContent.Create(new LoginRequest(email, password)));
+        loginResponse.IsSuccessStatusCode.Should().BeTrue();
+        
+        var changePasswordRequest = new HttpRequestMessage(HttpMethod.Post, "/api/auth/changepassword");
+        changePasswordRequest.Content = JsonContent.Create(new ChangePasswordRequest(password, newPassword));
+
+        using var changePassResponse = await client.SendAsync(changePasswordRequest);
+        changePassResponse.IsSuccessStatusCode.Should().BeTrue();
     }
 }

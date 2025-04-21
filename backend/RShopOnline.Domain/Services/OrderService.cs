@@ -1,6 +1,7 @@
 ﻿using RShopAPI_Test.Core.Common;
 using RShopAPI_Test.Core.Enums;
 using RShopAPI_Test.Core.Models;
+using RShopAPI_Test.Services.Authorization;
 using RShopAPI_Test.Services.Commands;
 using RShopAPI_Test.Services.Interfaces;
 using RShopAPI_Test.Storage.Interfaces;
@@ -10,31 +11,45 @@ namespace RShopAPI_Test.Services.Services;
 public class OrderService(
     IOrdersRepository ordersRepository, 
     IProductsRepository productsRepository,
-    ICurrentUserService currentUserService) : IOrderService
+    IIdentityProvider identityProvider,
+    IIntentionManager intentionManager) : IOrderService
 {
-    public async Task<Result<Order>> GetOrderById(Guid orderId, CancellationToken ct)
+    public async Task<Result<Order>> GetOrderById(GetOrderByIdCommand command, CancellationToken ct)
     {
-        var order = await ordersRepository.GetOrderById(orderId, ct);
+        if (!intentionManager.IsAllowed<GetOrderByIdCommand>())
+        {
+            return new Error(ErrorCode.Forbidden);
+        }
+        
+        var order = await ordersRepository.GetOrderById(command.OrderId, ct);
         if (order is null)
         {
-            return new Error("Order not found!");
+            return new Error("Order not found!", ErrorCode.NotFound);
         }
         return order;
     }
 
-    public async Task<IEnumerable<Order>> GetOrdersByCurrentUser(CancellationToken ct)
+    public async Task<Result<IEnumerable<Order>>> GetOrdersByCurrentUser(
+        GetOrdersByCurrentUserCommand command, CancellationToken ct)
     {
-        var userId = currentUserService.GetCurrentUserId() ??
-                     throw new UnauthorizedAccessException("Unhandled unauthorized user exception!");
-
-        return await ordersRepository.GetOrdersByUserId(userId, ct);
+        if (!intentionManager.IsAllowed<GetOrdersByCurrentUserCommand>())
+        {
+            return new Error(ErrorCode.Forbidden);
+        }
+        
+        var userId = identityProvider.Current.Id;
+        var orders = await ordersRepository.GetOrdersByUserId(userId, ct);
+        return Result<IEnumerable<Order>>.Success(orders);
     }
 
     public async Task<Result<Order>> CreateOrder(CreateOrderCommand command, CancellationToken ct)
     {
-        var userId = currentUserService.GetCurrentUserId() ??
-                     throw new UnauthorizedAccessException("Unhandled unauthorized user exception!");
-
+        if (!intentionManager.IsAllowed<CreateOrderCommand>())
+        {
+            return new Error(ErrorCode.Forbidden);
+        }
+        
+        var userId = identityProvider.Current.Id;
         var orderId = Guid.NewGuid();
         var processedOrderItems = new List<OrderItem>(command.OrderItems.Count);
 
@@ -53,7 +68,7 @@ public class OrderService(
             var product = await productsRepository.GetProductById(orderItemDto.ProductId, ct);
             if (product is null)
             {
-                return new Error($"Product {orderItemDto.ProductId} not found!");
+                return new Error($"Product {orderItemDto.ProductId} not found!", ErrorCode.NotFound);
             }
 
             if (!product.InStock)
@@ -80,21 +95,23 @@ public class OrderService(
         return await ordersRepository.CreateOrder(orderId, userId, processedOrderItems, ct);
     }
 
-    public async Task<EmptyResult> CancelOrder(Guid orderId, CancellationToken ct)
+    public async Task<EmptyResult> CancelOrder(CancelOrderCommand command, CancellationToken ct)
     {
-        var userId = currentUserService.GetCurrentUserId() ??
-                     throw new UnauthorizedAccessException("Unhandled unauthorized user exception!");
+        if (!intentionManager.IsAllowed<CancelOrderCommand>())
+        {
+            return new Error(ErrorCode.Forbidden);
+        }
         
-        var order = await ordersRepository.GetOrderById(orderId, ct);
+        var userId = identityProvider.Current.Id;
+        var order = await ordersRepository.GetOrderById(command.OrderId, ct);
 
         if (order is null)
         {
-            return new Error($"Order with id {orderId} not found!");
+            return new Error($"Order with id {command.OrderId} not found!", ErrorCode.NotFound);
         }
 
         if (order.UserId != userId)
         {
-            //TODO Log unauthorized access
             return new Error("You are not allowed to cancel this order!");
         }
 
@@ -103,17 +120,21 @@ public class OrderService(
             return new Error($"Cannot cancel an order with status {order.Status.ToString()}!");
         }
         
-        await ordersRepository.ChangeOrderStatus(orderId, OrderStatus.CanceledByUser, ct);
+        await ordersRepository.ChangeOrderStatus(command.OrderId, OrderStatus.CanceledByUser, ct);
         return EmptyResult.Success();
     }
 
     public async Task<EmptyResult> UpdateOrderStatus(UpdateOrderStatusCommand command, CancellationToken ct)
     {
-        var order = await ordersRepository.GetOrderById(command.OrderId, ct);
+        if (!intentionManager.IsAllowed<UpdateOrderStatusCommand>())
+        {
+            return new Error(ErrorCode.Forbidden);
+        }
         
+        var order = await ordersRepository.GetOrderById(command.OrderId, ct);
         if (order is null)
         {
-            return new Error($"Order with id {command.OrderId} not found!");
+            return new Error($"Order with id {command.OrderId} not found!", ErrorCode.NotFound);
         }
 
         await ordersRepository.ChangeOrderStatus(order.Id, command.NewOrderStatus, ct);

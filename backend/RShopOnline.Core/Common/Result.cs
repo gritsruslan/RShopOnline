@@ -24,6 +24,9 @@ public class Result<TValue>
 
     public Error Error =>
         IsFailure ? _error! : throw new InvalidOperationException("Cannot get a error of a success result");
+    
+    public ErrorCode ErrorCode => IsFailure ? 
+        _error!.Code : throw new InvalidOperationException("Cannot get a error Code of a success result");
 
     public string ErrorMessage
         => IsFailure ? _error!.Message : throw new InvalidOperationException("Cannot get an error message of a success result");

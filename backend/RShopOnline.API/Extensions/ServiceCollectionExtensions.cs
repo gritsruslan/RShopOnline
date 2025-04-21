@@ -2,11 +2,12 @@
 using System.Text;
 using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using RShopAPI_Test.Mapping;
-using RShopAPI_Test.Services.Auth;
+using RShopAPI_Test.Services.Authentication;
+using RShopAPI_Test.Services.Authorization;
+using RShopAPI_Test.Services.Authorization.Resolvers;
 using RShopAPI_Test.Services.Interfaces;
 using RShopAPI_Test.Services.Jwt;
 using RShopAPI_Test.Services.Security;
@@ -61,35 +62,33 @@ public static class ServiceCollectionExtensions
 
     public static IServiceCollection AddAutoMapping(this IServiceCollection services)
     {
-        services.AddAutoMapper(Assembly.GetAssembly(typeof(CategoryProfile)));
-        services.AddAutoMapper(Assembly.GetAssembly(typeof(CreateProductRequestProfile)));
+        services.AddAutoMapper(Assembly.GetAssembly(typeof(CategoryProfile)))
+                .AddAutoMapper(Assembly.GetAssembly(typeof(CreateProductRequestProfile)));
         return services;
     }
 
     public static IServiceCollection AddServices(this IServiceCollection services)
     {
-        services.AddScoped<IAuthService, AuthService>();
-        services.AddScoped<ICategoryService, CategoryService>();
-        services.AddScoped<IProductService, ProductService>();
-        services.AddScoped<IRoleService, RoleService>();
-        services.AddScoped<IOrderService, OrderService>();
-        services.AddScoped<ICurrentUserService, CurrentUserService>();
+        services.AddScoped<IAuthService, AuthService>()
+            .AddScoped<ICategoryService, CategoryService>()
+            .AddScoped<IProductService, ProductService>()
+            .AddScoped<IOrderService, OrderService>();
         return services;
     }
 
     public static IServiceCollection AddRepositories(this IServiceCollection services)
     {
-        services.AddScoped<ICategoriesRepository, CategoriesRepository>();
-        services.AddScoped<IUsersRepository, UsersRepository>();
-        services.AddScoped<IProductsRepository, ProductsRepository>();
-        services.AddScoped<IOrdersRepository, OrdersRepository>();
+        services.AddScoped<ICategoriesRepository, CategoriesRepository>()
+            .AddScoped<IUsersRepository, UsersRepository>()
+            .AddScoped<IProductsRepository, ProductsRepository>()
+            .AddScoped<IOrdersRepository, OrdersRepository>();
         return services;
     }
 
     public static IServiceCollection AddSecurity(this IServiceCollection services)
     {
-        services.AddScoped<IPasswordHasher, PasswordHasher>();
-        services.AddScoped<ISaltGenerator, SaltGenerator>();
+        services.AddScoped<IPasswordHasher, PasswordHasher>()
+                .AddScoped<ISaltGenerator, SaltGenerator>();
         return services;
     }
 
@@ -124,14 +123,24 @@ public static class ServiceCollectionExtensions
                 };
             });
 
+        services.AddScoped<IIdentityProvider, IdentityProvider>();
+        services.AddScoped<IAuthenticationService, AuthenticationService>();
+
         return services;
     }
 
     public static IServiceCollection AddApiAuthorization(this IServiceCollection services)
     {
-        services.AddAuthorization();
-        services.AddScoped<IAuthorizationHandler, RoleAuthorizationHandler>();
-        services.AddSingleton<IAuthorizationPolicyProvider, RolePolicyProvider>();
+        services.AddScoped<IIntentionManager, IntentionManager>();
+        services.AddScoped<IIntentionResolver, CancelOrderIntentionResolver>();
+        services.AddScoped<IIntentionResolver, ChangePasswordIntentionResolver>();
+        services.AddScoped<IIntentionResolver, CreateCategoryIntentionResolver>();
+        services.AddScoped<IIntentionResolver, CreateOrderIntentionResolver>();
+        services.AddScoped<IIntentionResolver, CreateProductIntentionResolver>();
+        services.AddScoped<IIntentionResolver, GetOrderByIdIntentionResolver>();
+        services.AddScoped<IIntentionResolver, GetOrdersByCurrentUserIntentionResolver>();
+        services.AddScoped<IIntentionResolver, UpdateOrderStatusIntentionResolver>();
+        services.AddScoped<IIntentionResolver, UpdateProductIntentionResolver>();
         return services;
     }
 }

@@ -1,7 +1,7 @@
 ﻿using FluentValidation;
-using Microsoft.Extensions.Logging;
 using RShopAPI_Test.Core.Common;
 using RShopAPI_Test.Core.Enums;
+using RShopAPI_Test.Services.Authorization;
 using RShopAPI_Test.Services.Commands;
 using RShopAPI_Test.Services.Interfaces;
 using RShopAPI_Test.Services.Jwt;
@@ -15,9 +15,10 @@ public class AuthService(
     IUsersRepository repository,
     ISaltGenerator saltGenerator,
     IPasswordHasher passwordHasher,
-    ICurrentUserService currentUserService,
+    IIdentityProvider identityProvider,
+    IIntentionManager intentionManager,
     
-    //TODO : Fix validators
+    //TODO : Fix validators dep injection
     IValidator<RegistrationCommand> registrationValidator,
     IValidator<LoginCommand> loginValidator,
     IValidator<ChangePasswordCommand> changePasswordValidator,
@@ -26,11 +27,11 @@ public class AuthService(
 {
     public async Task<EmptyResult> Registration(RegistrationCommand command, CancellationToken ct)
     {
-        var validationResult = await registrationValidator.ValidateAsync(command, ct);
+        /*var validationResult = await registrationValidator.ValidateAsync(command, ct);
         if (!validationResult.IsValid)
         {
             return new Error(validationResult.Errors[0].ErrorMessage);
-        }
+        }*/
         
         bool userExists = await repository.UserExists(command.Email, ct);
         if (userExists)
@@ -42,9 +43,10 @@ public class AuthService(
         byte[] passwordHash = passwordHasher.HashPassword(command.Password, salt);
         
         await repository.CreateUser(
+            command.Name, 
             command.Email, 
-            command.Password, 
-            passwordHash, salt, 
+            passwordHash, 
+            salt, 
             Role.Customer, 
             ct);
 
@@ -55,11 +57,11 @@ public class AuthService(
     {
         const string errorMessage = "Invalid username or password";
         
-        var validationResult = await loginValidator.ValidateAsync(command, ct);
+        /*var validationResult = await loginValidator.ValidateAsync(command, ct);
         if (!validationResult.IsValid)
         {
             return new Error(errorMessage);
-        }
+        }*/
         
         var candidate = await repository.GetUserByEmail(command.Email, ct);
         if (candidate is null)
@@ -80,30 +82,33 @@ public class AuthService(
 
     public async Task<EmptyResult> ChangePassword(ChangePasswordCommand command, CancellationToken ct)
     {
+        if (!intentionManager.IsAllowed<ChangePasswordCommand>())
+        {
+            return new Error(ErrorCode.Forbidden);
+        }
+        
         const string invalidPasswordMessage = "Invalid password!";
         var validationResult = await changePasswordValidator.ValidateAsync(command, ct);
-        if (!validationResult.IsValid)
+        /*if (!validationResult.IsValid)
         {
             return new Error(invalidPasswordMessage);
-        }
-        
-        var userId = currentUserService.GetCurrentUserId() 
-                     ?? throw new UnauthorizedAccessException("Unhandled unauthorized user!");
-        
-        var candidate = await repository.GetUserById(userId, ct);
-        if (candidate is null)
+        }*/
+
+        var userId = identityProvider.Current.Id;
+        var user = await repository.GetUserById(userId, ct);
+        if (user is null)
         {
-            return new Error("User with given id does not exist");
+            return new Error(ErrorCode.Unauthorized);
         }
         
-        bool isCorrectPassword = passwordHasher.VerifyPassword(command.Password, candidate.PasswordHash, candidate.Salt);
+        bool isCorrectPassword = passwordHasher.VerifyPassword(command.Password, user.PasswordHash, user.Salt);
 
         if (!isCorrectPassword)
         {
             return new Error("Invalid password");
         }
         
-        var newPasswordHash = passwordHasher.HashPassword(command.NewPassword, candidate.Salt);
+        var newPasswordHash = passwordHasher.HashPassword(command.NewPassword, user.Salt);
         await repository.UpdatePassword(newPasswordHash, ct);
         
         return EmptyResult.Success();

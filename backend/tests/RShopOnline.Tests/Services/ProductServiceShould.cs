@@ -2,6 +2,7 @@
 using Moq;
 using Moq.Language.Flow;
 using RShopAPI_Test.Core.Models;
+using RShopAPI_Test.Services.Authorization;
 using RShopAPI_Test.Services.Commands;
 using RShopAPI_Test.Services.Services;
 using RShopAPI_Test.Storage.Interfaces;
@@ -42,12 +43,16 @@ public class ProductServiceShould
         
         GetProductsSetup = ProductsRepository.Setup(
             p => p.GetProducts(It.IsAny<Guid>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<CancellationToken>()));
+
+        var intentionManager = new Mock<IIntentionManager>();
+        intentionManager.Setup(m => m.IsAllowed<UpdateProductCommand>()).Returns(true);
+        intentionManager.Setup(m => m.IsAllowed<CreateOrderCommand>()).Returns(true);
         
-        Sut = new ProductService(ProductsRepository.Object, CategoriesRepository.Object);
+        Sut = new ProductService(ProductsRepository.Object, CategoriesRepository.Object, intentionManager.Object);
     }
 
     [Fact]
-    public async Task CreateProduct_WhenCategoryExists()
+    public async Task SuccessfullyCreateProduct()
     {
         Guid guid = Guid.Parse("9B4522C0-36F2-4387-BF29-230DF010EE78");
         string name = "name";

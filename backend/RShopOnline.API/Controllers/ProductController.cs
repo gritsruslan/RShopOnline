@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using RShopAPI_Test.Core.Enums;
 using RShopAPI_Test.Core.Models;
 using RShopAPI_Test.DTOs;
-using RShopAPI_Test.Services.Auth;
 using RShopAPI_Test.Services.Commands;
 using RShopAPI_Test.Services.Interfaces;
 
@@ -59,7 +58,6 @@ public class ProductController(IProductService service) : ControllerBase
     }
 
     [HttpPost]
-    [RequireRole(Role.Admin, Role.Manager)]
     [ProducesResponseType<Product>(201)]
     [ProducesResponseType(400)]
     public async Task<IActionResult> CreateProduct(
@@ -76,7 +74,6 @@ public class ProductController(IProductService service) : ControllerBase
     }
 
     [HttpPut]
-    [RequireRole(Role.Admin, Role.Manager)]
     [ProducesResponseType<Product>(200)]
     [ProducesResponseType(400)]
     public async Task<IActionResult> UpdateProduct(
