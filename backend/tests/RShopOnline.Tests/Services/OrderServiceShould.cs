@@ -51,7 +51,7 @@ public class OrderServiceShould
     [Fact]
     public async Task DontCreateOrder_WhenOrderIsEmpty()
     {
-        GetCurrentIdentitySetup.Returns(new UserIdentity(Guid.Parse("BFD817A2-940D-4CE6-B8F5-675E55AE4768"),
+        GetCurrentIdentitySetup.Returns(new RecognizedUser(Guid.Parse("BFD817A2-940D-4CE6-B8F5-675E55AE4768"),
             Role.Customer));
         var result = await Sut.CreateOrder(new CreateOrderCommand([]), CancellationToken.None);
         result.IsFailure.Should().BeTrue();
@@ -60,7 +60,7 @@ public class OrderServiceShould
     [Fact]
     public async Task DontCreateOrder_WhenInvalidQuantityOfProduct()
     {
-        GetCurrentIdentitySetup.Returns(new UserIdentity(Guid.Parse("BFD817A2-940D-4CE6-B8F5-675E55AE4768"),
+        GetCurrentIdentitySetup.Returns(new RecognizedUser(Guid.Parse("BFD817A2-940D-4CE6-B8F5-675E55AE4768"),
             Role.Customer));
         var orderItem = new OrderItemDto(Guid.Parse("729A272D-BC7F-4A99-A148-19EA0B1B358D"), -10);
 
@@ -72,7 +72,7 @@ public class OrderServiceShould
     [Fact]
     public async Task DontCreateOrder_WhenProductNotFound()
     {
-        GetCurrentIdentitySetup.Returns(new UserIdentity(Guid.Parse("BFD817A2-940D-4CE6-B8F5-675E55AE4768"),
+        GetCurrentIdentitySetup.Returns(new RecognizedUser(Guid.Parse("BFD817A2-940D-4CE6-B8F5-675E55AE4768"),
             Role.Customer));
         GetProductByIdSetup.ReturnsAsync((Product?)null);
         var orderItem = new OrderItemDto(Guid.Parse("729A272D-BC7F-4A99-A148-19EA0B1B358D"), 1);
@@ -85,7 +85,7 @@ public class OrderServiceShould
     [Fact]
     public async Task DontCreateOrder_WhenProductIsNotInStock()
     {
-        GetCurrentIdentitySetup.Returns(new UserIdentity(Guid.Parse("BFD817A2-940D-4CE6-B8F5-675E55AE4768"),
+        GetCurrentIdentitySetup.Returns(new RecognizedUser(Guid.Parse("BFD817A2-940D-4CE6-B8F5-675E55AE4768"),
             Role.Customer));
         GetProductByIdSetup.ReturnsAsync(new Product()
         {
@@ -104,7 +104,7 @@ public class OrderServiceShould
     [Fact]
     public async Task DontCreateOrder_WhenProductAddedMultipleTimes()
     {
-        GetCurrentIdentitySetup.Returns(new UserIdentity(Guid.Parse("BFD817A2-940D-4CE6-B8F5-675E55AE4768"),
+        GetCurrentIdentitySetup.Returns(new RecognizedUser(Guid.Parse("BFD817A2-940D-4CE6-B8F5-675E55AE4768"),
             Role.Customer));
         var productId = Guid.Parse("729A272D-BC7F-4A99-A148-19EA0B1B358D");
         GetProductByIdSetup.ReturnsAsync(new Product()
@@ -126,7 +126,7 @@ public class OrderServiceShould
     [Fact]
     public async Task SuccessfullyCreateOrder()
     {
-        GetCurrentIdentitySetup.Returns(new UserIdentity(Guid.Parse("BFD817A2-940D-4CE6-B8F5-675E55AE4768"),
+        GetCurrentIdentitySetup.Returns(new RecognizedUser(Guid.Parse("BFD817A2-940D-4CE6-B8F5-675E55AE4768"),
             Role.Customer));
         GetProductByIdSetup.ReturnsAsync(new Product()
         {
@@ -145,7 +145,7 @@ public class OrderServiceShould
     [Fact]
     public async Task DontCancelOrder_WhenOrderNotFound()
     {
-        GetCurrentIdentitySetup.Returns(new UserIdentity(Guid.Parse("BFD817A2-940D-4CE6-B8F5-675E55AE4768"),
+        GetCurrentIdentitySetup.Returns(new RecognizedUser(Guid.Parse("BFD817A2-940D-4CE6-B8F5-675E55AE4768"),
             Role.Customer));
         GetOrderByIdSetup.ReturnsAsync((Order?)null);
 
@@ -157,7 +157,7 @@ public class OrderServiceShould
     [Fact]
     public async Task DontCancelOrder_WhenUserIsNotACreatorOfOrder()
     {
-        GetCurrentIdentitySetup.Returns(new UserIdentity(Guid.Parse("D9E8236C-FFCE-4A63-9F45-BA770E4D265D"), Role.Customer));
+        GetCurrentIdentitySetup.Returns(new RecognizedUser(Guid.Parse("D9E8236C-FFCE-4A63-9F45-BA770E4D265D"), Role.Customer));
         GetOrderByIdSetup.ReturnsAsync(new Order
         {
             UserId = Guid.Parse("1637361F-B58A-457F-8370-0B65B30E715B"),
@@ -173,7 +173,7 @@ public class OrderServiceShould
     public async Task DontCancelOrder_WhenOrderStatusIsNotPending()
     {
         var userId = Guid.Parse("E861A307-1E93-4BAC-9D07-083A4B4053C1");
-        GetCurrentIdentitySetup.Returns(new UserIdentity(userId, Role.Customer));
+        GetCurrentIdentitySetup.Returns(new RecognizedUser(userId, Role.Customer));
         GetOrderByIdSetup.ReturnsAsync(new Order
         {
             UserId = userId,
@@ -191,7 +191,7 @@ public class OrderServiceShould
     public async Task SuccessfullyCancelOrder()
     {
         var userId = Guid.Parse("E861A307-1E93-4BAC-9D07-083A4B4053C1");
-        GetCurrentIdentitySetup.Returns(new UserIdentity(userId, Role.Customer));
+        GetCurrentIdentitySetup.Returns(new RecognizedUser(userId, Role.Customer));
         GetOrderByIdSetup.ReturnsAsync(new Order
         {
             UserId = userId,

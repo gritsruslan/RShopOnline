@@ -12,9 +12,9 @@ public class AuthenticationService(IUsersRepository repository) : IAuthenticatio
 
         if (user is null)
         {
-            return UserIdentity.Guest;
+            return RecognizedUser.Guest;
         }
 
-        return new UserIdentity(user.Id, user.Role);
+        return new RecognizedUser(user.Id, user.Role);
     }
 }

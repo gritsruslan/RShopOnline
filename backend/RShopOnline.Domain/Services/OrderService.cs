@@ -1,6 +1,7 @@
 ﻿using RShopAPI_Test.Core.Common;
 using RShopAPI_Test.Core.Enums;
 using RShopAPI_Test.Core.Models;
+using RShopAPI_Test.Services.Authentication;
 using RShopAPI_Test.Services.Authorization;
 using RShopAPI_Test.Services.Commands;
 using RShopAPI_Test.Services.Interfaces;
@@ -68,7 +69,7 @@ public class OrderService(
             var product = await productsRepository.GetProductById(orderItemDto.ProductId, ct);
             if (product is null)
             {
-                return new Error($"Product {orderItemDto.ProductId} not found!", ErrorCode.NotFound);
+                return new Error($"Product {orderItemDto.ProductId} not found!");
             }
 
             if (!product.InStock)
@@ -112,7 +113,7 @@ public class OrderService(
 
         if (order.UserId != userId)
         {
-            return new Error("You are not allowed to cancel this order!");
+            return new Error("You are not allowed to cancel this order!", ErrorCode.Forbidden);
         }
 
         if (order.Status != OrderStatus.Pending)

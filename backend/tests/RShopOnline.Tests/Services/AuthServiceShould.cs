@@ -14,6 +14,7 @@ using RShopAPI_Test.Services.Jwt;
 using RShopAPI_Test.Services.Security;
 using RShopAPI_Test.Services.Services;
 using RShopAPI_Test.Storage.Interfaces;
+using IValidatorFactory = RShopAPI_Test.Services.Validators.Services.IValidatorFactory;
 
 namespace RShopOnline.Tests.Services;
 
@@ -33,23 +34,13 @@ public class AuthServiceShould
         var jwtProvider = new Mock<IJwtProvider>();
         var identityProvider = new Mock<IIdentityProvider>();
         identityProvider.Setup(r => r.Current).Returns(
-            new UserIdentity(Guid.Parse("960D90CB-014A-474D-A250-4520A795D091"), Role.Customer));
+            new RecognizedUser(Guid.Parse("960D90CB-014A-474D-A250-4520A795D091"), Role.Customer));
         
         var intentionManager = new Mock<IIntentionManager>();
         intentionManager.Setup(m => m.IsAllowed<ChangePasswordCommand>()).Returns(true);
-            
-        var registrationValidator = new Mock<IValidator<RegistrationCommand>>();
-        var loginValidator = new Mock<IValidator<LoginCommand>>();
-        var changePasswordValidator = new Mock<IValidator<ChangePasswordCommand>>();
 
-        registrationValidator
-            .Setup(r => r.ValidateAsync(It.IsAny<RegistrationCommand>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new ValidationResult());
-        loginValidator
-            .Setup(r => r.ValidateAsync(It.IsAny<LoginCommand>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new ValidationResult());
-        changePasswordValidator
-            .Setup(r => r.ValidateAsync(It.IsAny<ChangePasswordCommand>(), It.IsAny<CancellationToken>()))
+        var validator = new Mock<IValidatorFactory>();
+        validator.Setup(v => v.ValidateAsync(It.IsAny<object>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(new ValidationResult());
         
         Sut = new AuthService(
@@ -58,9 +49,7 @@ public class AuthServiceShould
             PasswordHasher, 
             identityProvider.Object,
             intentionManager.Object,
-            registrationValidator.Object, 
-            loginValidator.Object, 
-            changePasswordValidator.Object, 
+            validator.Object, 
             jwtProvider.Object);
 
         UserExistsByEmailSetup = usersRepository

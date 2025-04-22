@@ -12,6 +12,8 @@ public class ProductService(
     ICategoriesRepository categoriesRepository,
     IIntentionManager intentionManager) : IProductService
 {
+    private readonly IReadOnlySet<string> _productFields = new HashSet<string> {"Name", "Price", "InStock"};
+    
     public async Task<Result<Product>> CreateProduct(CreateProductCommand command, CancellationToken ct)
     {
         if (!intentionManager.IsAllowed<CreateOrderCommand>())
@@ -22,7 +24,7 @@ public class ProductService(
         var categoryExist = await categoriesRepository.CategoryExists(command.CategoryId, ct);
         if (!categoryExist)
         {
-            return new Error("Category doesn't exist", ErrorCode.NotFound);
+            return new Error("Category doesn't exist");
         }
         
         return await productsRepository.CreateProduct(command.Name, command.Price, command.CategoryId, command.InStock,
@@ -39,14 +41,11 @@ public class ProductService(
         var product = await productsRepository.GetProductById(id, ct);
         if (product is null)
         {
-            return new Error("Product not found");
+            return new Error("Product not found", ErrorCode.NotFound);
         }
         return product;
     }
     
-    private readonly IReadOnlySet<string> _productFields = 
-        new HashSet<string> {"Name", "Price", "InStock"};
-
     public async Task<Result<IEnumerable<Product>>> GetProducts(GetProductsCommand command, CancellationToken ct)
     {
         bool categoryExists = await categoriesRepository.CategoryExists(command.CategoryId, ct);

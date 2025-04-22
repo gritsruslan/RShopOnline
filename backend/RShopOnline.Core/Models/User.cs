@@ -15,14 +15,4 @@ public class User
     public required byte[] Salt { get; set; }
     
     public Role Role { get; set; }
-    
-    public static User Guest => new User()
-    {
-        Id = Guid.Empty,
-        Name = string.Empty,
-        Email = string.Empty,
-        PasswordHash = [],
-        Salt = [],
-        Role = Role.Guest
-    };
 }

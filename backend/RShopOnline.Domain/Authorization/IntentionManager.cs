@@ -1,4 +1,4 @@
-using RShopAPI_Test.Services.Interfaces;
+using RShopAPI_Test.Services.Authentication;
 
 namespace RShopAPI_Test.Services.Authorization;
 

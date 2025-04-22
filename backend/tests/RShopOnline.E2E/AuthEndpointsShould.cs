@@ -2,16 +2,15 @@
 using FluentAssertions;
 using RShopAPI_Test.DTOs;
 using RShopAPI_Test.Services.Commands;
-using Xunit.Abstractions;
 
 namespace RShopOnline.E2E;
 
-public class AuthEndpointsShould(RShopApiApplicationFactory factory, ITestOutputHelper testOutputHelper) : IClassFixture<RShopApiApplicationFactory>
+public class AuthEndpointsShould(RShopApiApplicationFactory factory) : IClassFixture<RShopApiApplicationFactory>
 {
     public const string Uri = "http://localhost";
     
     [Fact]
-    public async Task SuccessfullyregisterUser()
+    public async Task SuccessfullyRegisterUser()
     {
         using var client = factory.CreateClient();
         using var response = await client.PostAsync("/api/auth/register",

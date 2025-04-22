@@ -1,6 +1,4 @@
-﻿using RShopAPI_Test.Core.Models;
-using RShopAPI_Test.Services.Authentication;
-using RShopAPI_Test.Services.Interfaces;
+﻿using RShopAPI_Test.Services.Authentication;
 using RShopAPI_Test.Services.Jwt;
 
 namespace RShopAPI_Test.Middlewares;
@@ -22,7 +20,7 @@ public class AuthenticationMiddleware(RequestDelegate next)
         }
         else
         {
-            identityProvider.Current = UserIdentity.Guest;
+            identityProvider.Current = RecognizedUser.Guest;
         }
         
         await next(httpContext);
