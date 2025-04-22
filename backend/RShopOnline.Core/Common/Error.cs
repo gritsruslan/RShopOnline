@@ -1,4 +1,4 @@
-﻿namespace RShopAPI_Test.Core.Common;
+namespace RShopAPI_Test.Core.Common;
 
 public class Error
 {

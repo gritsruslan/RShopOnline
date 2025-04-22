@@ -1,31 +1,20 @@
-﻿namespace RShopAPI_Test.Core.Common;
+namespace RShopAPI_Test.Core.Common;
 
-public class EmptyResult
+public class EmptyResult : Result
 {
-    private EmptyResult()
+    public EmptyResult(Error error) : base(error)
     {
-        _error = null;
-        IsSuccess = true;
     }
 
-    private EmptyResult(Error error)
+    public EmptyResult() : base(SuccessCode.Ok)
     {
-        _error = error;
-        IsSuccess = false;
     }
 
-    private readonly Error? _error;
-    
-    public Error Error => IsFailure ? 
-        _error! : throw new InvalidOperationException();
-
-    public string ErrorMessage => IsFailure ? _error!.Message
-        : throw new InvalidOperationException();
-    public bool IsSuccess { get; }
-
-    public bool IsFailure => !IsSuccess;
+    public EmptyResult(SuccessCode successCode) : base(successCode)
+    {
+    }
 
     public static EmptyResult Success() => new();
-
+    
     public static implicit operator EmptyResult(Error error) => new(error);
 }

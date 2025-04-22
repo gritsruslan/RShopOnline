@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using RShopAPI_Test.Core.Enums;
 using RShopAPI_Test.Core.Models;
 using RShopAPI_Test.DTOs;
+using RShopAPI_Test.Factories;
 using RShopAPI_Test.Services.Commands;
 using RShopAPI_Test.Services.Interfaces;
 
@@ -19,11 +20,7 @@ public class CategoryController(ICategoryService service) : ControllerBase
         CancellationToken ct)
     {
         var result = await service.CreateCategory(new CreateCategoryCommand(request.Name), ct);
-        if (result.IsFailure)
-        {
-            return BadRequest(result.Error);
-        }
-        return Ok();
+        return HttpResponseFactory.FromResult(result);
     }
 
     [HttpGet]

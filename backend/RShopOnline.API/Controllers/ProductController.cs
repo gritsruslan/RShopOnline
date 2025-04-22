@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
-using RShopAPI_Test.Core.Enums;
 using RShopAPI_Test.Core.Models;
 using RShopAPI_Test.DTOs;
+using RShopAPI_Test.Factories;
 using RShopAPI_Test.Services.Commands;
 using RShopAPI_Test.Services.Interfaces;
 
@@ -35,11 +35,7 @@ public class ProductController(IProductService service) : ControllerBase
     {
         var getProductsCommand = new GetProductsCommand(categoryId, page, pageSize, orderBy, ascending);
         var result = await service.GetProducts(getProductsCommand, ct);
-        
-        if (result.IsFailure)
-            return BadRequest(result.Error);
-
-        return Ok(result.Value);
+        return HttpResponseFactory.FromResult(result);
     }
     
     [HttpGet("{id::guid}")]
@@ -50,11 +46,7 @@ public class ProductController(IProductService service) : ControllerBase
         CancellationToken ct)
     {
         var result = await service.GetProduct(id, ct);
-
-        if (result.IsFailure)
-            return BadRequest();
-        
-        return Ok(result.Value);
+        return HttpResponseFactory.FromResult(result);
     }
 
     [HttpPost]
@@ -66,11 +58,7 @@ public class ProductController(IProductService service) : ControllerBase
         CancellationToken ct)
     {
         var result = await service.CreateProduct(mapper.Map<CreateProductCommand>(request), ct);
-        
-        if(result.IsFailure)
-            return BadRequest(result.Error);
-        
-        return Ok(result.Value);
+        return HttpResponseFactory.FromResult(result);
     }
 
     [HttpPut]
@@ -82,10 +70,6 @@ public class ProductController(IProductService service) : ControllerBase
         CancellationToken ct)
     {
         var result = await service.UpdateProduct(mapper.Map<UpdateProductCommand>(request), ct);
-        
-        if(result.IsFailure)
-            return BadRequest(result.Error);
-        
-        return Ok(result.Value);
+        return HttpResponseFactory.FromResult(result);
     }
 }

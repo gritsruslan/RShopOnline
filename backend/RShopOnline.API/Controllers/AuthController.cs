@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RShopAPI_Test.DTOs;
+using RShopAPI_Test.Factories;
 using RShopAPI_Test.Services.Commands;
 using RShopAPI_Test.Services.Interfaces;
 
@@ -19,15 +20,11 @@ public class AuthController(IAuthService service, IMapper mapper) : ControllerBa
         CancellationToken ct)
     {
         var result = await service.Login(mapper.Map<LoginCommand>(request), ct);
-
-        if (result.IsFailure)
+        if (result.IsSuccess)
         {
-            return BadRequest(result.Error);
+            HttpContext.Response.Cookies.Append("my-cookies", result.Value);
         }
-       
-        HttpContext.Response.Cookies.Append("my-cookies", result.Value);
-        
-        return Ok();
+        return HttpResponseFactory.FromResult(result);
     }
 
 
@@ -39,13 +36,7 @@ public class AuthController(IAuthService service, IMapper mapper) : ControllerBa
         CancellationToken ct)
     {
         var result = await service.Registration(mapper.Map<RegistrationCommand>(request), ct);
-
-        if (result.IsFailure)
-        {
-            return BadRequest(result.Error);
-        }
-
-        return Ok();
+        return HttpResponseFactory.FromResult(result);
     }
 
 
@@ -56,12 +47,6 @@ public class AuthController(IAuthService service, IMapper mapper) : ControllerBa
     public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest request, CancellationToken ct)
     {
         var result = await service.ChangePassword(mapper.Map<ChangePasswordCommand>(request), ct);
-
-        if (result.IsFailure)
-        {
-            return BadRequest(result.Error);
-        }
-
-        return Ok();
+        return HttpResponseFactory.FromResult(result);
     }
 }

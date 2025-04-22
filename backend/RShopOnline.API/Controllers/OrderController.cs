@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using RShopAPI_Test.Core.Models;
 using RShopAPI_Test.DTOs;
+using RShopAPI_Test.Factories;
 using RShopAPI_Test.Services.Commands;
 using RShopAPI_Test.Services.Interfaces;
 
@@ -17,11 +18,7 @@ public class OrderController(IOrderService service, IMapper mapper) : Controller
     public async Task<IActionResult> GetOrderById([FromRoute] Guid id, CancellationToken ct)
     {
         var result = await service.GetOrderById(new(id), ct);
-        if (result.IsFailure)
-        {
-            return BadRequest(result.Error);
-        }
-        return Ok(result.Value);
+        return HttpResponseFactory.FromResult(result);
     }
 
     [HttpGet("user")]
@@ -39,11 +36,7 @@ public class OrderController(IOrderService service, IMapper mapper) : Controller
     public async Task<IActionResult> CreateOrder([FromBody] CreateOrderRequest request, CancellationToken ct)
     {
         var result = await service.CreateOrder(mapper.Map<CreateOrderCommand>(request), ct);
-        if (result.IsFailure)
-        {
-            return BadRequest(result.Error);
-        }
-        return Ok(result.Value);
+        return HttpResponseFactory.FromResult(result);
     }
 
     [HttpPut("cancel")]
@@ -52,11 +45,7 @@ public class OrderController(IOrderService service, IMapper mapper) : Controller
     public async Task<IActionResult> CancelOrder([FromRoute] Guid id, CancellationToken ct)
     {
         var result = await service.CancelOrder(new(id), ct);
-        if (result.IsFailure)
-        {
-            return BadRequest(result.Error);
-        }
-        return Ok();
+        return HttpResponseFactory.FromResult(result);
     }
 
     [HttpPut]
@@ -65,10 +54,6 @@ public class OrderController(IOrderService service, IMapper mapper) : Controller
     public async Task<IActionResult> UpdateOrderStatus([FromBody] UpdateOrderStatusRequest request, CancellationToken ct)
     {
         var result = await service.UpdateOrderStatus(mapper.Map<UpdateOrderStatusCommand>(request), ct);
-        if (result.IsFailure)
-        {
-            return BadRequest(result.Error);
-        }
-        return Ok();
+        return HttpResponseFactory.FromResult(result);
     }
 }
