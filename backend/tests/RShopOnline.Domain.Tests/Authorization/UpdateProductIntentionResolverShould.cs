@@ -3,12 +3,12 @@ using RShopAPI_Test.Core.Enums;
 using RShopAPI_Test.Services.Authentication;
 using RShopAPI_Test.Services.Authorization.Resolvers;
 
-namespace RShopOnline.Tests.Authorization;
+namespace RShopOnline.Domain.Tests.Authorization;
 
-public class CreateProductIntentionResolverShould
+public class UpdateProductIntentionResolverShould
 {
-    private readonly CreateProductIntentionResolver sut = new();
-    
+    private readonly UpdateProductIntentionResolver sut = new();
+
     [Theory]
     [InlineData(Role.Manager)]
     [InlineData(Role.Admin)]

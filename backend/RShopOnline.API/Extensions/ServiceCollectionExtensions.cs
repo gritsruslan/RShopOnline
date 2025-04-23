@@ -13,12 +13,14 @@ using RShopAPI_Test.Services.Jwt;
 using RShopAPI_Test.Services.Security;
 using RShopAPI_Test.Services.Services;
 using RShopAPI_Test.Services.Validators;
+using RShopAPI_Test.Services.Validators.Services;
 using RShopAPI_Test.Storage;
 using RShopAPI_Test.Storage.Interfaces;
 using RShopAPI_Test.Storage.Mapping;
 using RShopAPI_Test.Storage.Repositories;
 using Serilog;
 using Serilog.Filters;
+using IValidatorFactory = RShopAPI_Test.Services.Validators.Services.IValidatorFactory;
 
 namespace RShopAPI_Test.Extensions;
 
@@ -57,6 +59,7 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddValidators(this IServiceCollection services)
     {
         services.AddValidatorsFromAssembly(Assembly.GetAssembly(typeof(RegistrationCommandValidator)));
+        services.AddScoped<IValidatorFactory, ValidatorFactory>();
         return services;
     }
 

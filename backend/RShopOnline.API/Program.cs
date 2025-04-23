@@ -10,7 +10,7 @@ builder.Services.AddEndpointsApiExplorer()
     .AddSwaggerGen()
     .AddControllers();
 
-builder.Services.AddHttpContextAccessor()
+builder.Services
     .AddDatabase(configuration)
     .AddValidators()
     .AddAutoMapping()

@@ -19,5 +19,5 @@ public interface IUsersRepository
     
     public Task<bool> UserExists(string email, CancellationToken ct);
     
-    public Task UpdatePassword(byte[] newPasswordHash, CancellationToken ct);
+    public Task UpdatePassword(Guid id, byte[] newPasswordHash, CancellationToken ct);
 }

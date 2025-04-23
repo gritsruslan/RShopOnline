@@ -16,7 +16,7 @@ using RShopAPI_Test.Services.Services;
 using RShopAPI_Test.Storage.Interfaces;
 using IValidatorFactory = RShopAPI_Test.Services.Validators.Services.IValidatorFactory;
 
-namespace RShopOnline.Tests.Services;
+namespace RShopOnline.Domain.Tests.Services;
 
 public class AuthServiceShould
 {

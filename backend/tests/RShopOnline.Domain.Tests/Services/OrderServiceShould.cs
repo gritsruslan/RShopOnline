@@ -11,7 +11,7 @@ using RShopAPI_Test.Services.Interfaces;
 using RShopAPI_Test.Services.Services;
 using RShopAPI_Test.Storage.Interfaces;
 
-namespace RShopOnline.Tests.Services;
+namespace RShopOnline.Domain.Tests.Services;
 
 public class OrderServiceShould
 {

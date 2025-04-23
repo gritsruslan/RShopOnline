@@ -102,7 +102,7 @@ public class AuthService(
         }
         
         var newPasswordHash = passwordHasher.HashPassword(command.NewPassword, user.Salt);
-        await repository.UpdatePassword(newPasswordHash, ct);
+        await repository.UpdatePassword(userId, newPasswordHash, ct);
         
         return EmptyResult.Success();
     }

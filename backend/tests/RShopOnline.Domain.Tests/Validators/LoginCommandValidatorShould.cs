@@ -2,7 +2,7 @@
 using RShopAPI_Test.Services.Commands;
 using RShopAPI_Test.Services.Validators;
 
-namespace RShopOnline.Tests.Validators;
+namespace RShopOnline.Domain.Tests.Validators;
 
 public class LoginCommandValidatorShould
 {

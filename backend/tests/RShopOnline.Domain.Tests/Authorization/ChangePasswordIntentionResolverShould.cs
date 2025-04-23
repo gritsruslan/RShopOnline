@@ -3,7 +3,7 @@ using RShopAPI_Test.Core.Enums;
 using RShopAPI_Test.Services.Authentication;
 using RShopAPI_Test.Services.Authorization.Resolvers;
 
-namespace RShopOnline.Tests.Authorization;
+namespace RShopOnline.Domain.Tests.Authorization;
 
 public class ChangePasswordIntentionResolverShould
 {

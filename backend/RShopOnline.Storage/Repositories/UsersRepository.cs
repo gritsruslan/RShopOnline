@@ -24,9 +24,10 @@ public class UsersRepository(RShopDbContext dbContext, IMapper mapper) : IUsersR
         await dbContext.SaveChangesAsync(ct);
     }
 
-    public async Task UpdatePassword(byte[] newPasswordHash, CancellationToken ct)
+    public async Task UpdatePassword(Guid userId, byte[] newPasswordHash, CancellationToken ct)
     {
         await dbContext.Users
+            .Where(u => u.Id == userId)
             .ExecuteUpdateAsync(u => 
                 u.SetProperty(u => u.PasswordHash, newPasswordHash), ct);
         await dbContext.SaveChangesAsync(ct);

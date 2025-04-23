@@ -31,9 +31,7 @@ public class ProductsRepository(RShopDbContext dbContext, IMapper mapper) : IPro
         CancellationToken ct)
     {
         var query = dbContext.Products.AsNoTracking()
-            .Where(p => p.CategoryId == categoryId)
-            .Skip(skip)
-            .Take(take);
+            .Where(p => p.CategoryId == categoryId);
 
         Expression<Func<ProductEntity, object>> orderByExpression = orderByField switch
         {
@@ -47,6 +45,10 @@ public class ProductsRepository(RShopDbContext dbContext, IMapper mapper) : IPro
             query = query.OrderBy(orderByExpression);
         else
             query = query.OrderByDescending(orderByExpression);
+        
+        query = query
+            .Skip(skip)
+            .Take(take);
 
         return await query.ProjectTo<Product>(mapper.ConfigurationProvider).ToListAsync(ct);
     }

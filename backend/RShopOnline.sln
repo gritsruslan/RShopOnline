@@ -18,9 +18,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "solution-items", "solution-
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{ECAB8340-1F11-4CB4-AA9E-1E9DBBC984E9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RShopOnline.Tests", "tests\RShopOnline.Tests\RShopOnline.Tests.csproj", "{6F5EC851-A539-428D-A96D-99EC51A59885}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RShopOnline.Domain.Tests", "tests\RShopOnline.Domain.Tests\RShopOnline.Domain.Tests.csproj", "{6F5EC851-A539-428D-A96D-99EC51A59885}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RShopOnline.E2E", "tests\RShopOnline.E2E\RShopOnline.E2E.csproj", "{A58E363F-A40D-4A96-A56A-D4F1B53D4D0C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RShopOnline.Storage.Tests", "tests\RShopOnline.Storage.Tests\RShopOnline.Storage.Tests.csproj", "{13730644-2452-47A4-8527-32D9126CBDE8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -52,9 +54,14 @@ Global
 		{A58E363F-A40D-4A96-A56A-D4F1B53D4D0C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A58E363F-A40D-4A96-A56A-D4F1B53D4D0C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A58E363F-A40D-4A96-A56A-D4F1B53D4D0C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{13730644-2452-47A4-8527-32D9126CBDE8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{13730644-2452-47A4-8527-32D9126CBDE8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{13730644-2452-47A4-8527-32D9126CBDE8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{13730644-2452-47A4-8527-32D9126CBDE8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{6F5EC851-A539-428D-A96D-99EC51A59885} = {ECAB8340-1F11-4CB4-AA9E-1E9DBBC984E9}
 		{A58E363F-A40D-4A96-A56A-D4F1B53D4D0C} = {ECAB8340-1F11-4CB4-AA9E-1E9DBBC984E9}
+		{13730644-2452-47A4-8527-32D9126CBDE8} = {ECAB8340-1F11-4CB4-AA9E-1E9DBBC984E9}
 	EndGlobalSection
 EndGlobal
