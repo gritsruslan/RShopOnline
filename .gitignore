@@ -9,4 +9,5 @@ riderModule.iml
 *.db
 *.db-shm
 *.db-wal
+*.user
 !MarketHistory.Db
