@@ -2,11 +2,11 @@
 using RShopAPI_Test.Core.Common;
 using EmptyResult = RShopAPI_Test.Core.Common.EmptyResult;
 
-namespace RShopAPI_Test.Factories;
+namespace RShopAPI_Test.Extensions;
 
-public static class HttpResponseFactory
+public static class ResultExtensions
 {
-    public static IActionResult FromResult(EmptyResult result)
+    public static IActionResult ToResponse(this EmptyResult result)
     {
         if (result.IsSuccess)
         {
@@ -29,9 +29,8 @@ public static class HttpResponseFactory
         };
     }
 
-    public static IActionResult FromResult<T>(Result<T> result)
+    public static IActionResult ToResponse<T>(this Result<T> result)
     {
-        
         if (result.IsSuccess)
         {
             return result.SuccessCode switch

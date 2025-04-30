@@ -21,7 +21,7 @@ public class RShopDbContext(DbContextOptions<RShopDbContext> options) : DbContex
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetAssembly(typeof(UserEntityConfiguration))!);
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(UserEntityConfiguration).Assembly);
         base.OnModelCreating(modelBuilder);
     }
 }

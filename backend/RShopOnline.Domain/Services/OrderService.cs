@@ -52,13 +52,14 @@ public class OrderService(
         
         var userId = identityProvider.Current.Id;
         var orderId = Guid.NewGuid();
-        var processedOrderItems = new List<OrderItem>(command.OrderItems.Count);
-
+        
         if (command.OrderItems.Count == 0)
         {
             return new Error("Order is empty!");
         }
         
+        var listTasksProducts = new List<Task<Product?>>();
+
         foreach (var orderItemDto in command.OrderItems)
         {
             if (orderItemDto.Quantity <= 0)
@@ -66,7 +67,20 @@ public class OrderService(
                 return new Error($"Invalid order quantity for product {orderItemDto.ProductId}");
             }
             
-            var product = await productsRepository.GetProductById(orderItemDto.ProductId, ct);
+            var getProductTask = productsRepository.GetProductById(orderItemDto.ProductId, ct);
+            listTasksProducts.Add(getProductTask);
+        }
+        
+        await Task.WhenAll(listTasksProducts);
+        
+        var listProducts = listTasksProducts.Select(p => p.Result).ToList();
+        var processedOrderItems = new List<OrderItem>(listProducts.Count);
+        
+        for (int i = 0; i < listProducts.Count; i++)
+        {
+            var orderItemDto = command.OrderItems[i];
+            var product = listProducts[i];
+            
             if (product is null)
             {
                 return new Error($"Product {orderItemDto.ProductId} not found!");
@@ -81,7 +95,7 @@ public class OrderService(
             {
                 return new Error($"Product {orderItemDto.ProductId} added to order multiple times!");
             }
-
+            
             var orderItem = new OrderItem()
             {
                 OrderId = orderId,
@@ -92,7 +106,7 @@ public class OrderService(
             
             processedOrderItems.Add(orderItem);
         }
-
+        
         return await ordersRepository.CreateOrder(orderId, userId, processedOrderItems, ct);
     }
 

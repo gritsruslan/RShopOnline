@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using RShopAPI_Test;
 using RShopAPI_Test.Storage;
 using Testcontainers.PostgreSql;
 

@@ -1,6 +1,10 @@
 ﻿namespace RShopAPI_Test.Storage.Minio;
 
-internal static class MinioOptions
+public class MinioOptions
 {
-    public const string ImagesBucketName = "images";
+    public required string Endpoint { get; set; }
+    
+    public required string AccessKey { get; set; }
+    
+    public required string SecretKey { get; set; }
 }

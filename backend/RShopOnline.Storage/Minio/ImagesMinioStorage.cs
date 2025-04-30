@@ -11,18 +11,18 @@ public class ImagesMinioStorage(IMinioClient minioClient) : IImagesMinioStorage
     {
         await EnsureBucketExists(ct);
         var statObject = await minioClient.StatObjectAsync(
-            new StatObjectArgs().WithBucket(MinioOptions.ImagesBucketName).WithObject(imageName), ct);
+            new StatObjectArgs().WithBucket(MinioBuckets.ImagesBucketName).WithObject(imageName), ct);
         return statObject.Size != 0;
     }
 
     public async Task<(Stream, ContentType)> GetImage(string imageName, CancellationToken ct)
     {
         var fileStat = await minioClient.StatObjectAsync(
-            new StatObjectArgs().WithBucket(MinioOptions.ImagesBucketName).WithObject(imageName), ct);
+            new StatObjectArgs().WithBucket(MinioBuckets.ImagesBucketName).WithObject(imageName), ct);
         
         var memoryStream = new MemoryStream();
         await minioClient.GetObjectAsync(
-            new GetObjectArgs().WithBucket(MinioOptions.ImagesBucketName).WithObject(imageName)
+            new GetObjectArgs().WithBucket(MinioBuckets.ImagesBucketName).WithObject(imageName)
                 .WithCallbackStream(stream => { stream.CopyTo(memoryStream); }), ct);
         
         var contentType = new ContentType(fileStat.ContentType);
@@ -42,7 +42,7 @@ public class ImagesMinioStorage(IMinioClient minioClient) : IImagesMinioStorage
         
         await minioClient.PutObjectAsync(
             new PutObjectArgs()
-                .WithBucket(MinioOptions.ImagesBucketName)
+                .WithBucket(MinioBuckets.ImagesBucketName)
                 .WithObject(imageName)
                 .WithStreamData(imageStream)
                 .WithObjectSize(objectSize)
@@ -53,17 +53,17 @@ public class ImagesMinioStorage(IMinioClient minioClient) : IImagesMinioStorage
     {
         await minioClient.RemoveObjectAsync(
             new RemoveObjectArgs()
-                .WithBucket(MinioOptions.ImagesBucketName)
+                .WithBucket(MinioBuckets.ImagesBucketName)
                 .WithObject(imageName), ct);
     }
 
     private async Task EnsureBucketExists(CancellationToken ct)
     {
         bool bucketExists = await minioClient.BucketExistsAsync(
-            new BucketExistsArgs().WithBucket(MinioOptions.ImagesBucketName), ct);
+            new BucketExistsArgs().WithBucket(MinioBuckets.ImagesBucketName), ct);
         if (!bucketExists)
         {
-            await minioClient.MakeBucketAsync(new MakeBucketArgs().WithBucket(MinioOptions.ImagesBucketName), ct);
+            await minioClient.MakeBucketAsync(new MakeBucketArgs().WithBucket(MinioBuckets.ImagesBucketName), ct);
         }
     }
 }

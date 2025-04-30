@@ -45,6 +45,7 @@ public class ProductServiceShould
             p => p.GetProducts(It.IsAny<Guid>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<CancellationToken>()));
 
         var intentionManager = new Mock<IIntentionManager>();
+        intentionManager.Setup(m => m.IsAllowed<CreateProductCommand>()).Returns(true);
         intentionManager.Setup(m => m.IsAllowed<UpdateProductCommand>()).Returns(true);
         intentionManager.Setup(m => m.IsAllowed<CreateOrderCommand>()).Returns(true);
         

@@ -1,5 +1,5 @@
 ﻿using RShopAPI_Test.Services.Authentication;
-using RShopAPI_Test.Services.Jwt;
+using RShopAPI_Test.Services.Authentication.Jwt;
 
 namespace RShopAPI_Test.Middlewares;
 

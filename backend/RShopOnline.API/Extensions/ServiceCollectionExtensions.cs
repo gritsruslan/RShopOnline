@@ -1,5 +1,4 @@
-﻿using System.Reflection;
-using System.Text;
+﻿using System.Text;
 using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -7,10 +6,10 @@ using Microsoft.IdentityModel.Tokens;
 using Minio;
 using RShopAPI_Test.Mapping;
 using RShopAPI_Test.Services.Authentication;
+using RShopAPI_Test.Services.Authentication.Jwt;
 using RShopAPI_Test.Services.Authorization;
 using RShopAPI_Test.Services.Authorization.Resolvers;
 using RShopAPI_Test.Services.Interfaces;
-using RShopAPI_Test.Services.Jwt;
 using RShopAPI_Test.Services.Security;
 using RShopAPI_Test.Services.Services;
 using RShopAPI_Test.Services.Validators;
@@ -40,13 +39,13 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddAppLogging(
         this IServiceCollection services, 
         IConfiguration configuration, 
-        string environmentName)
+        IWebHostEnvironment environment)
     {
         services.AddLogging(b => b.AddSerilog(
             new LoggerConfiguration()
                 .MinimumLevel.Warning()
                 .Enrich.WithProperty("Application", "RShopOnline.API")
-                .Enrich.WithProperty("Environment", environmentName)
+                .Enrich.WithProperty("Environment", environment.EnvironmentName)
                 .WriteTo.Logger(
                     lc => lc.Filter.ByExcluding(
                         Matching.FromSource("Microsoft")).WriteTo.OpenSearch(
@@ -60,51 +59,50 @@ public static class ServiceCollectionExtensions
 
     public static IServiceCollection AddValidators(this IServiceCollection services)
     {
-        services.AddValidatorsFromAssembly(Assembly.GetAssembly(typeof(RegistrationCommandValidator)));
-        services.AddScoped<IValidatorFactory, ValidatorFactory>();
-        return services;
+        return services
+            .AddValidatorsFromAssembly(typeof(RegistrationCommandValidator).Assembly)
+            .AddScoped<IValidatorFactory, ValidatorFactory>();
     }
 
     public static IServiceCollection AddAutoMapping(this IServiceCollection services)
     {
-        services.AddAutoMapper(Assembly.GetAssembly(typeof(CategoryProfile)))
-                .AddAutoMapper(Assembly.GetAssembly(typeof(CreateProductRequestProfile)));
-        return services;
+        return services
+            .AddAutoMapper(typeof(CategoryProfile).Assembly)
+            .AddAutoMapper(typeof(CreateProductRequestProfile).Assembly);
     }
 
     public static IServiceCollection AddServices(this IServiceCollection services)
     {
-        services.AddScoped<IAuthService, AuthService>()
+        return services
+            .AddScoped<IAuthService, AuthService>()
             .AddScoped<ICategoryService, CategoryService>()
             .AddScoped<IProductService, ProductService>()
             .AddScoped<IOrderService, OrderService>()
             .AddScoped<IImageService, ImageService>();
-        return services;
     }
 
     public static IServiceCollection AddRepositories(this IServiceCollection services)
     {
-        services.AddScoped<ICategoriesRepository, CategoriesRepository>()
+        return services
+            .AddScoped<ICategoriesRepository, CategoriesRepository>()
             .AddScoped<IUsersRepository, UsersRepository>()
             .AddScoped<IProductsRepository, ProductsRepository>()
             .AddScoped<IOrdersRepository, OrdersRepository>()
             .AddScoped<IImagesRepository, ImagesRepository>();
-        return services;
     }
 
     public static IServiceCollection AddSecurity(this IServiceCollection services)
     {
-        services.AddScoped<IPasswordHasher, PasswordHasher>()
+        return services.AddScoped<IPasswordHasher, PasswordHasher>()
                 .AddScoped<ISaltGenerator, SaltGenerator>();
-        return services;
     }
 
     public static IServiceCollection AddApiAuthentication(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddScoped<IJwtProvider, JwtProvider>();
-        services.Configure<JwtOptions>(configuration.GetSection("JwtOptions"));
+        services.Configure<JwtOptions>(configuration.GetSection(nameof(JwtOptions)));
 
-        var jwtOptions = configuration.GetRequiredSection("JwtOptions").Get<JwtOptions>()!;
+        var jwtOptions = configuration.GetRequiredSection(nameof(JwtOptions)).Get<JwtOptions>()!;
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
             {
@@ -124,7 +122,7 @@ public static class ServiceCollectionExtensions
                 {
                     OnMessageReceived = context =>
                     {
-                        context.Token = context.Request.Cookies["my-cookies"];
+                        context.Token = context.Request.Cookies[CookieNames.AuthToken];
                         return Task.CompletedTask;
                     }
                 };
@@ -138,29 +136,31 @@ public static class ServiceCollectionExtensions
 
     public static IServiceCollection AddApiAuthorization(this IServiceCollection services)
     {
-        services.AddScoped<IIntentionManager, IntentionManager>();
-        services.AddScoped<IIntentionResolver, CancelOrderIntentionResolver>();
-        services.AddScoped<IIntentionResolver, ChangePasswordIntentionResolver>();
-        services.AddScoped<IIntentionResolver, CreateCategoryIntentionResolver>();
-        services.AddScoped<IIntentionResolver, CreateOrderIntentionResolver>();
-        services.AddScoped<IIntentionResolver, CreateProductIntentionResolver>();
-        services.AddScoped<IIntentionResolver, GetOrderByIdIntentionResolver>();
-        services.AddScoped<IIntentionResolver, GetOrdersByCurrentUserIntentionResolver>();
-        services.AddScoped<IIntentionResolver, UpdateOrderStatusIntentionResolver>();
-        services.AddScoped<IIntentionResolver, UpdateProductIntentionResolver>();
-        return services;
+        return services.AddScoped<IIntentionManager, IntentionManager>()
+            .AddScoped<IIntentionResolver, CancelOrderIntentionResolver>()
+            .AddScoped<IIntentionResolver, ChangePasswordIntentionResolver>()
+            .AddScoped<IIntentionResolver, CreateCategoryIntentionResolver>()
+            .AddScoped<IIntentionResolver, CreateOrderIntentionResolver>()
+            .AddScoped<IIntentionResolver, CreateProductIntentionResolver>()
+            .AddScoped<IIntentionResolver, GetOrderByIdIntentionResolver>()
+            .AddScoped<IIntentionResolver, GetOrdersByCurrentUserIntentionResolver>()
+            .AddScoped<IIntentionResolver, UpdateOrderStatusIntentionResolver>()
+            .AddScoped<IIntentionResolver, UpdateProductIntentionResolver>();
     }
 
-    public static IServiceCollection AddMinio(this IServiceCollection services)
+    public static IServiceCollection AddMinio(this IServiceCollection services, IConfiguration configuration)
     {
+        services.Configure<MinioOptions>(configuration.GetSection(nameof(MinioOptions)));
+        
+        var minioOptions = configuration.GetRequiredSection(nameof(MinioOptions)).Get<MinioOptions>()!;
         services.AddSingleton<IMinioClient, MinioClient>(_ =>
         {
             var minioClient = new MinioClient()
-                .WithEndpoint("localhost:9000")
-                .WithCredentials("admin", "admin123")
+                .WithEndpoint(minioOptions.Endpoint)
+                .WithCredentials(minioOptions.AccessKey, minioOptions.SecretKey)
                 .WithSSL(false)
                 .Build();
-            return (MinioClient) minioClient;
+            return  (MinioClient) minioClient;
         });
         services.AddScoped<IImagesMinioStorage, ImagesMinioStorage>();
         return services;

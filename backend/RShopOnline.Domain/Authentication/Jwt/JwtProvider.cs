@@ -5,7 +5,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using RShopAPI_Test.Core.Models;
 
-namespace RShopAPI_Test.Services.Jwt;
+namespace RShopAPI_Test.Services.Authentication.Jwt;
 
 public class JwtProvider(IOptions<JwtOptions> options) : IJwtProvider
 {

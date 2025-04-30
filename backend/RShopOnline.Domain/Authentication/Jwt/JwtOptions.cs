@@ -1,4 +1,4 @@
-﻿namespace RShopAPI_Test.Services.Jwt;
+﻿namespace RShopAPI_Test.Services.Authentication.Jwt;
 
 public class JwtOptions
 {

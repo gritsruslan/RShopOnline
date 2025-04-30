@@ -4,7 +4,7 @@ using RShopAPI_Test.Middlewares;
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
 
-builder.Services.AddAppLogging(configuration, builder.Environment.EnvironmentName);
+builder.Services.AddAppLogging(configuration, builder.Environment);
     
 builder.Services.AddEndpointsApiExplorer()
     .AddSwaggerGen()
@@ -17,7 +17,7 @@ builder.Services
     .AddServices()
     .AddRepositories()
     .AddSecurity()
-    .AddMinio()
+    .AddMinio(configuration)
     .AddApiAuthentication(configuration)
     .AddApiAuthorization();
 
@@ -41,4 +41,4 @@ app.UseAuthorization();
 
 app.Run();
 
-public partial class Program {}
+public partial class Program;

@@ -2,14 +2,14 @@
 using Microsoft.AspNetCore.Mvc;
 using RShopAPI_Test.Core.Models;
 using RShopAPI_Test.DTOs;
-using RShopAPI_Test.Factories;
+using RShopAPI_Test.Extensions;
 using RShopAPI_Test.Services.Commands;
 using RShopAPI_Test.Services.Interfaces;
 
 namespace RShopAPI_Test.Controllers;
 
 [ApiController]
-[Route("/api/products")]
+[Route("api/products")]
 public class ProductController(IProductService service) : ControllerBase
 {
     [HttpGet("all")]
@@ -35,7 +35,7 @@ public class ProductController(IProductService service) : ControllerBase
     {
         var getProductsCommand = new GetProductsCommand(categoryId, page, pageSize, orderBy, ascending);
         var result = await service.GetProducts(getProductsCommand, ct);
-        return HttpResponseFactory.FromResult(result);
+        return result.ToResponse();
     }
     
     [HttpGet("{id::guid}")]
@@ -46,7 +46,7 @@ public class ProductController(IProductService service) : ControllerBase
         CancellationToken ct)
     {
         var result = await service.GetProduct(id, ct);
-        return HttpResponseFactory.FromResult(result);
+        return result.ToResponse();
     }
 
     [HttpPost]
@@ -58,7 +58,7 @@ public class ProductController(IProductService service) : ControllerBase
         CancellationToken ct)
     {
         var result = await service.CreateProduct(mapper.Map<CreateProductCommand>(request), ct);
-        return HttpResponseFactory.FromResult(result);
+        return result.ToResponse();
     }
 
     [HttpPut]
@@ -70,7 +70,7 @@ public class ProductController(IProductService service) : ControllerBase
         CancellationToken ct)
     {
         var result = await service.UpdateProduct(mapper.Map<UpdateProductCommand>(request), ct);
-        return HttpResponseFactory.FromResult(result);
+        return result.ToResponse();
     }
     
     
@@ -82,7 +82,7 @@ public class ProductController(IProductService service) : ControllerBase
         CancellationToken ct)
     {
         var result = await service.GetProductImagesNames(id, ct);
-        return HttpResponseFactory.FromResult(result);
+        return result.ToResponse();
     }
 
     [HttpPost("{id::guid}/images")]
@@ -92,7 +92,7 @@ public class ProductController(IProductService service) : ControllerBase
         CancellationToken ct)
     {
         var result = await service.AddProductImage(new AddProductImageCommand(file, id), ct);
-        return HttpResponseFactory.FromResult(result);
+        return result.ToResponse();
     }
 
     [HttpDelete("{id::guid}/images/{imageName}")]
@@ -102,6 +102,6 @@ public class ProductController(IProductService service) : ControllerBase
         CancellationToken ct)
     {
         var result = await service.DeleteProductImage(new DeleteProductImageCommand(id, imageName), ct);
-        return HttpResponseFactory.FromResult(result);
+        return result.ToResponse();
     }
 }

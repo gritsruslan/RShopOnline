@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using RShopAPI_Test.Core.Models;
 using RShopAPI_Test.DTOs;
-using RShopAPI_Test.Factories;
+using RShopAPI_Test.Extensions;
 using RShopAPI_Test.Services.Commands;
 using RShopAPI_Test.Services.Interfaces;
 
@@ -18,7 +18,7 @@ public class OrderController(IOrderService service, IMapper mapper) : Controller
     public async Task<IActionResult> GetOrderById([FromRoute] Guid id, CancellationToken ct)
     {
         var result = await service.GetOrderById(new(id), ct);
-        return HttpResponseFactory.FromResult(result);
+        return result.ToResponse();
     }
 
     [HttpGet("user")]
@@ -36,7 +36,7 @@ public class OrderController(IOrderService service, IMapper mapper) : Controller
     public async Task<IActionResult> CreateOrder([FromBody] CreateOrderRequest request, CancellationToken ct)
     {
         var result = await service.CreateOrder(mapper.Map<CreateOrderCommand>(request), ct);
-        return HttpResponseFactory.FromResult(result);
+        return result.ToResponse();
     }
 
     [HttpPut("cancel")]
@@ -45,7 +45,7 @@ public class OrderController(IOrderService service, IMapper mapper) : Controller
     public async Task<IActionResult> CancelOrder([FromRoute] Guid id, CancellationToken ct)
     {
         var result = await service.CancelOrder(new(id), ct);
-        return HttpResponseFactory.FromResult(result);
+        return result.ToResponse();
     }
 
     [HttpPut]
@@ -54,6 +54,6 @@ public class OrderController(IOrderService service, IMapper mapper) : Controller
     public async Task<IActionResult> UpdateOrderStatus([FromBody] UpdateOrderStatusRequest request, CancellationToken ct)
     {
         var result = await service.UpdateOrderStatus(mapper.Map<UpdateOrderStatusCommand>(request), ct);
-        return HttpResponseFactory.FromResult(result);
+        return result.ToResponse();
     }
 }

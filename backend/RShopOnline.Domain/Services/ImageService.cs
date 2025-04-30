@@ -1,5 +1,4 @@
 ﻿using System.Net.Mime;
-using Microsoft.AspNetCore.Http;
 using RShopAPI_Test.Core.Common;
 using RShopAPI_Test.Services.Interfaces;
 using RShopAPI_Test.Storage.Interfaces;
