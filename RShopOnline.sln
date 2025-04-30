@@ -1,19 +1,20 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RShopOnline.API", "RShopOnline.API\RShopOnline.API.csproj", "{5AB21333-5C76-4A0E-9DB5-9BC34103F435}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RShopOnline.API", "src\RShopOnline.API\RShopOnline.API.csproj", "{5AB21333-5C76-4A0E-9DB5-9BC34103F435}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RShopOnline.Core", "RShopOnline.Core\RShopOnline.Core.csproj", "{88FACA2C-D492-488B-958B-A2895E86DAA1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RShopOnline.Core", "src\RShopOnline.Core\RShopOnline.Core.csproj", "{88FACA2C-D492-488B-958B-A2895E86DAA1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RShopOnline.Domain", "RShopOnline.Domain\RShopOnline.Domain.csproj", "{8D939518-B6D7-437A-B768-1410E791DA7A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RShopOnline.Domain", "src\RShopOnline.Domain\RShopOnline.Domain.csproj", "{8D939518-B6D7-437A-B768-1410E791DA7A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RShopOnline.Storage", "RShopOnline.Storage\RShopOnline.Storage.csproj", "{262BC5B4-7567-43F9-AC9E-7C6991C148D6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RShopOnline.Storage", "src\RShopOnline.Storage\RShopOnline.Storage.csproj", "{262BC5B4-7567-43F9-AC9E-7C6991C148D6}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "solution-items", "solution-items", "{0E91187C-0EF5-412E-9229-AAB9AA26B343}"
 	ProjectSection(SolutionItems) = preProject
-		..\.gitignore = ..\.gitignore
-		..\LICENSE = ..\LICENSE
-		..\README.md = ..\README.md
-		docker-compose.yml = docker-compose.yml
+		.gitignore = .gitignore
+		LICENSE = LICENSE
+		README.md = README.md
+		RShopOnline.sln = RShopOnline.sln
+		docker\docker-compose.yml = docker\docker-compose.yml
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{ECAB8340-1F11-4CB4-AA9E-1E9DBBC984E9}"

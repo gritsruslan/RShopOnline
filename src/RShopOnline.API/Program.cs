@@ -32,7 +32,6 @@ if (app.Environment.IsDevelopment())
 app.AssertMapperConfigurationIsValid();
 
 app.UseMiddleware<GlobalExceptionHandler>();
-app.UseHttpsRedirection();
 app.MapControllers();
 
 app.UseAuthentication();

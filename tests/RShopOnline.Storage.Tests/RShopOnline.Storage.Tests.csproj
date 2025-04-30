@@ -21,7 +21,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\RShopOnline.Storage\RShopOnline.Storage.csproj" />
+      <ProjectReference Include="..\..\src\RShopOnline.Storage\RShopOnline.Storage.csproj" />
     </ItemGroup>
 
 </Project>
