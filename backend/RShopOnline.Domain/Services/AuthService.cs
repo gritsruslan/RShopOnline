@@ -23,11 +23,13 @@ public class AuthService(
 {
     public async Task<EmptyResult> Registration(RegistrationCommand command, CancellationToken ct)
     {
+        /*
         var validationResult = await validator.ValidateAsync(command, ct);
         if (!validationResult.IsValid)
         {
             return new Error(validationResult.Errors[0].ErrorMessage, ErrorCode.Unauthorized);
         }
+        */
         
         bool userExists = await repository.UserExists(command.Email, ct);
         if (userExists)
@@ -52,12 +54,13 @@ public class AuthService(
     public async Task<Result<string>> Login(LoginCommand command, CancellationToken ct)
     {
         const string errorMessage = "Invalid username or password";
-        
+        /*
         var validationResult = await validator.ValidateAsync(command, ct);
         if (!validationResult.IsValid)
         {
             return new Error(errorMessage, ErrorCode.Unauthorized);
         }
+        */
         
         var candidate = await repository.GetUserByEmail(command.Email, ct);
         if (candidate is null)

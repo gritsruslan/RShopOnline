@@ -48,7 +48,15 @@ public class ProductServiceShould
         intentionManager.Setup(m => m.IsAllowed<UpdateProductCommand>()).Returns(true);
         intentionManager.Setup(m => m.IsAllowed<CreateOrderCommand>()).Returns(true);
         
-        Sut = new ProductService(ProductsRepository.Object, CategoriesRepository.Object, intentionManager.Object);
+        var imagesMinioStorage = new Mock<IImagesMinioStorage>();
+        var imagesRepository = new Mock<IImagesRepository>();
+        
+        Sut = new ProductService(
+            ProductsRepository.Object, 
+            CategoriesRepository.Object,
+            imagesRepository.Object, 
+            imagesMinioStorage.Object,  
+            intentionManager.Object);
     }
 
     [Fact]

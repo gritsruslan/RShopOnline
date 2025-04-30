@@ -18,4 +18,6 @@ public class ProductEntity
     
     
     public ICollection<OrderItemEntity> OrderItems { get; set; } = null!;
+    
+    public ICollection<ImageInfoEntity> Images { get; set; } = null!;
 }

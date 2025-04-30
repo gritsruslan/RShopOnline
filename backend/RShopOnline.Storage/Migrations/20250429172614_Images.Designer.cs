@@ -2,18 +2,21 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using RShopAPI_Test.Storage;
 
 #nullable disable
 
-namespace RShopOnline.API.Storage.Migrations
+namespace RShopAPI_Test.Storage.Migrations
 {
     [DbContext(typeof(RShopDbContext))]
-    partial class RShopDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250429172614_Images")]
+    partial class Images
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

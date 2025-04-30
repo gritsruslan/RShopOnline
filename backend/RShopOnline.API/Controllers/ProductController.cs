@@ -72,4 +72,36 @@ public class ProductController(IProductService service) : ControllerBase
         var result = await service.UpdateProduct(mapper.Map<UpdateProductCommand>(request), ct);
         return HttpResponseFactory.FromResult(result);
     }
+    
+    
+    //Images
+
+    [HttpGet("{id::guid}/images")]
+    public async Task<IActionResult> GetProductImagesNames(
+        [FromRoute] Guid id, 
+        CancellationToken ct)
+    {
+        var result = await service.GetProductImagesNames(id, ct);
+        return HttpResponseFactory.FromResult(result);
+    }
+
+    [HttpPost("{id::guid}/images")]
+    public async Task<IActionResult> AddProductImage(
+        [FromRoute] Guid id,
+        IFormFile file,
+        CancellationToken ct)
+    {
+        var result = await service.AddProductImage(new AddProductImageCommand(file, id), ct);
+        return HttpResponseFactory.FromResult(result);
+    }
+
+    [HttpDelete("{id::guid}/images/{imageName}")]
+    public async Task<IActionResult> DeleteProductImage(
+        [FromRoute] Guid id,
+        [FromRoute] string imageName,
+        CancellationToken ct)
+    {
+        var result = await service.DeleteProductImage(new DeleteProductImageCommand(id, imageName), ct);
+        return HttpResponseFactory.FromResult(result);
+    }
 }

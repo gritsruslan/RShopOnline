@@ -15,4 +15,11 @@ public interface IProductService
     Task<Result<IEnumerable<Product>>> GetProducts(GetProductsCommand command, CancellationToken ct);
 
     public Task<Result<Product>> UpdateProduct(UpdateProductCommand command, CancellationToken ct);
+    
+    //Images
+    Task<Result<IEnumerable<string>>> GetProductImagesNames(Guid productId, CancellationToken ct);
+
+    Task<Result<string>> AddProductImage(AddProductImageCommand command, CancellationToken ct);
+    
+    Task<EmptyResult> DeleteProductImage(DeleteProductImageCommand command, CancellationToken ct);
 }

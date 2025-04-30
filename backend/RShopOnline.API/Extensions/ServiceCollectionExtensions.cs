@@ -4,6 +4,7 @@ using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Minio;
 using RShopAPI_Test.Mapping;
 using RShopAPI_Test.Services.Authentication;
 using RShopAPI_Test.Services.Authorization;
@@ -17,6 +18,7 @@ using RShopAPI_Test.Services.Validators.Services;
 using RShopAPI_Test.Storage;
 using RShopAPI_Test.Storage.Interfaces;
 using RShopAPI_Test.Storage.Mapping;
+using RShopAPI_Test.Storage.Minio;
 using RShopAPI_Test.Storage.Repositories;
 using Serilog;
 using Serilog.Filters;
@@ -75,7 +77,8 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IAuthService, AuthService>()
             .AddScoped<ICategoryService, CategoryService>()
             .AddScoped<IProductService, ProductService>()
-            .AddScoped<IOrderService, OrderService>();
+            .AddScoped<IOrderService, OrderService>()
+            .AddScoped<IImageService, ImageService>();
         return services;
     }
 
@@ -84,7 +87,8 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ICategoriesRepository, CategoriesRepository>()
             .AddScoped<IUsersRepository, UsersRepository>()
             .AddScoped<IProductsRepository, ProductsRepository>()
-            .AddScoped<IOrdersRepository, OrdersRepository>();
+            .AddScoped<IOrdersRepository, OrdersRepository>()
+            .AddScoped<IImagesRepository, ImagesRepository>();
         return services;
     }
 
@@ -144,6 +148,21 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IIntentionResolver, GetOrdersByCurrentUserIntentionResolver>();
         services.AddScoped<IIntentionResolver, UpdateOrderStatusIntentionResolver>();
         services.AddScoped<IIntentionResolver, UpdateProductIntentionResolver>();
+        return services;
+    }
+
+    public static IServiceCollection AddMinio(this IServiceCollection services)
+    {
+        services.AddSingleton<IMinioClient, MinioClient>(_ =>
+        {
+            var minioClient = new MinioClient()
+                .WithEndpoint("localhost:9000")
+                .WithCredentials("admin", "admin123")
+                .WithSSL(false)
+                .Build();
+            return (MinioClient) minioClient;
+        });
+        services.AddScoped<IImagesMinioStorage, ImagesMinioStorage>();
         return services;
     }
 }

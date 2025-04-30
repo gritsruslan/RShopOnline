@@ -17,6 +17,7 @@ builder.Services
     .AddServices()
     .AddRepositories()
     .AddSecurity()
+    .AddMinio()
     .AddApiAuthentication(configuration)
     .AddApiAuthorization();
 

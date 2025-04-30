@@ -10,13 +10,15 @@ namespace RShopAPI_Test.Services.Services;
 public class ProductService(
     IProductsRepository productsRepository,
     ICategoriesRepository categoriesRepository,
+    IImagesRepository imagesRepository,
+    IImagesMinioStorage imagesStorage,
     IIntentionManager intentionManager) : IProductService
 {
     private readonly IReadOnlySet<string> _productFields = new HashSet<string> {"Name", "Price", "InStock"};
     
     public async Task<Result<Product>> CreateProduct(CreateProductCommand command, CancellationToken ct)
     {
-        if (!intentionManager.IsAllowed<CreateOrderCommand>())
+        if (!intentionManager.IsAllowed<CreateProductCommand>())
         {
             return new Error(ErrorCode.Forbidden);
         }
@@ -99,5 +101,68 @@ public class ProductService(
 
         return await productsRepository.UpdateProduct(command.Id, command.Name, command.Price, command.InStock,
             command.Description, ct);
+    }
+
+    public async Task<Result<IEnumerable<string>>> GetProductImagesNames(Guid productId, CancellationToken ct)
+    {
+        var productExists = await productsRepository.ProductExists(productId, ct);
+        if (!productExists)
+        {
+            return new Error("Product does not exist!");
+        }
+        
+        var imageInfos = await imagesRepository.GetImagesByProductId(productId, ct);
+        var imageNames = imageInfos.Select(i => i.Id + i.Extension);
+        return Result<IEnumerable<string>>.Success(imageNames);
+    }
+
+    public async Task<Result<string>> AddProductImage(AddProductImageCommand command, CancellationToken ct)
+    {
+        var (formFile, productId) = command;
+        var productExists = await productsRepository.ProductExists(productId, ct);
+        if (!productExists)
+        {
+            return new Error("Product does not exist!");
+        }
+        
+        var extension = Path.GetExtension(formFile.FileName);
+        
+        //add image to repository
+        var imageId = await imagesRepository.AddImage(productId, extension, ct);
+        var imageName = imageId + extension;
+        
+        // add image to minio storage
+        await using var imageStream = formFile.OpenReadStream();
+        await imagesStorage.UploadImage(imageStream, imageName, formFile.ContentType, formFile.Length, ct);
+
+        return imageName;
+    }
+
+    public async Task<EmptyResult> DeleteProductImage(DeleteProductImageCommand command, CancellationToken ct)
+    {
+        var (productId, imageName) = command;
+
+        var imageIdString = imageName.Substring(0, 35);
+        if (!Guid.TryParse(imageIdString, out Guid imageId))
+        {
+            return new Error("Image doesn't exist!");
+        }
+        
+        var productExists = await productsRepository.ProductExists(productId, ct);
+        if (!productExists)
+        {
+            return new Error("Product does not exist!");
+        }
+        
+        var imageExists = await imagesRepository.ImageExists(imageId, ct);
+        if (!imageExists)
+        {
+            return new Error("Image doesn't exist!");
+        }
+        
+        await imagesStorage.DeleteImage(imageName, ct);
+        await imagesRepository.DeleteImage(imageId, ct);
+        
+        return EmptyResult.Success();
     }
 }

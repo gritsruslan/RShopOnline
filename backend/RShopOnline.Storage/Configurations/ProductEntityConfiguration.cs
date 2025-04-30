@@ -25,5 +25,10 @@ public class ProductEntityConfiguration : IEntityTypeConfiguration<ProductEntity
         builder
             .HasMany(p => p.OrderItems)
             .WithOne(o => o.Product);
+        
+        builder
+            .HasMany<ImageInfoEntity>(p => p.Images)
+            .WithOne(i => i.Product)
+            .HasForeignKey(i => i.ProductId);
     }
 }
