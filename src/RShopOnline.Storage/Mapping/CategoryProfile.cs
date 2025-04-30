@@ -1,0 +1,14 @@
+﻿using AutoMapper;
+using RShopAPI_Test.Core.Models;
+using RShopAPI_Test.Storage.Entities;
+
+namespace RShopAPI_Test.Storage.Mapping;
+
+public class CategoryProfile : Profile
+{
+    public CategoryProfile()
+    {
+        CreateMap<CategoryEntity, Category>()
+            .ForSourceMember(src => src.Products, opt => opt.DoNotValidate());
+    }
+}

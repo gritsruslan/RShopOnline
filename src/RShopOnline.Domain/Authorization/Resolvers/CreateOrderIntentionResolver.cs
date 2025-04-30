@@ -1,0 +1,10 @@
+﻿using RShopAPI_Test.Core.Enums;
+using RShopAPI_Test.Services.Authentication;
+using RShopAPI_Test.Services.Commands;
+
+namespace RShopAPI_Test.Services.Authorization.Resolvers;
+
+public class CreateOrderIntentionResolver : IIntentionResolver<CreateOrderCommand>
+{
+    public bool IsAllowed(IIdentity identity) => identity.Role is Role.Customer;
+}

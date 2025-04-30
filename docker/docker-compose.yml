@@ -1,0 +1,57 @@
+volumes:
+  rshop-pg:
+  rshop-logs:
+  rshop-minio:
+    
+networks:
+  default:
+    name : 'rshop'
+
+services:
+  postgres:
+    container_name: 'rshop-pg'
+    image: 'postgres:latest'
+    ports:
+      - '5432:5432'
+    volumes:
+      - 'rshop-pg:/var/lib/postgresql/data'
+    environment:
+      POSTGRES_PASSWORD: '1234'
+      
+  opensearch:
+    container_name: 'rshop-os'
+    image: 'opensearchproject/opensearch:2'
+    ports:
+      - '9200:9200'
+      - '9600:9600'
+    volumes:
+      - 'rshop-logs:/usr/share/opensearch/data'
+    environment:
+      discovery.type: 'single-node'
+      plugins.security.ssl.http.enabled: false
+      plugins.security.disabled: true
+      OPENSEARCH_INITIAL_ADMIN_PASSWORD: 'Strong__Pass123'
+  
+  opensearch-dashboards:
+    container_name: 'rshop-osd'
+    image: 'opensearchproject/opensearch-dashboards:latest'
+    ports:
+      - '5601:5601'
+    environment:
+      OPENSEARCH_HOSTS: '["http://opensearch:9200"]'
+      DISABLE_SECURITY_DASHBOARDS_PLUGIN: true
+    depends_on:
+      - 'opensearch'
+    
+  minio:
+    container_name: 'rshop-minio'
+    image: 'minio/minio'
+    command: server --console-address ':9001' /data/
+    ports:
+      - '9000:9000'
+      - '9001:9001'
+    environment:
+      MINIO_ROOT_USER: 'admin'
+      MINIO_ROOT_PASSWORD: 'admin123'
+    volumes:
+      - 'rshop-minio:/data'
