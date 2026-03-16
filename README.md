@@ -1,6 +1,6 @@
 # RShopOnline
 
-**Simple ASP.NET Core WebAPI for online shop**
+**Simple ASP.NET Core WebAPI for an online shop**
 
 ## Features
 - PostgreSQL as the main persistent storage
